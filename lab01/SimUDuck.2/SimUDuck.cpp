@@ -15,8 +15,11 @@ class FlyWithWings : public IFlyBehavior
 public:
 	void Fly() override
 	{
-		cout << "I'm flying with wings!!" << endl;
+		cout << "I'm flying with wings!! (flight #" << ++m_flights << ')' << endl;
 	}
+
+private:
+	int m_flights = 0;
 };
 
 class FlyNoWay : public IFlyBehavior
