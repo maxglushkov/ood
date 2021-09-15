@@ -30,6 +30,17 @@ private:
 
 class CStatsDisplay : public IObserver<SWeatherInfo>
 {
+public:
+	CStatsDisplay()
+	{
+		for (auto const& [field, name] : FIELD_NAME_PAIRS)
+		{
+			m_minValues.*field = std::numeric_limits<double>::infinity();
+			m_maxValues.*field = -std::numeric_limits<double>::infinity();
+			m_accValues.*field = 0;
+		}
+	}
+
 private:
 	/* Метод Update сделан приватным, чтобы ограничить возможность его вызова напрямую
 	Классу CObservable он будет доступен все равно, т.к. в интерфейсе IObserver он
@@ -37,28 +48,36 @@ private:
 	*/
 	void Update(SWeatherInfo const& data) override
 	{
-		if (m_minTemperature > data.temperature)
-		{
-			m_minTemperature = data.temperature;
-		}
-		if (m_maxTemperature < data.temperature)
-		{
-			m_maxTemperature = data.temperature;
-		}
-		m_accTemperature += data.temperature;
 		++m_countAcc;
+		for (auto const& [field, name] : FIELD_NAME_PAIRS)
+		{
+			if (m_minValues.*field > data.*field)
+			{
+				m_minValues.*field = data.*field;
+			}
+			if (m_maxValues.*field < data.*field)
+			{
+				m_maxValues.*field = data.*field;
+			}
+			m_accValues.*field += data.*field;
 
-		std::cout << "Max Temp " << m_maxTemperature << std::endl;
-		std::cout << "Min Temp " << m_minTemperature << std::endl;
-		std::cout << "Average Temp " << (m_accTemperature / m_countAcc) << std::endl;
-		std::cout << "----------------" << std::endl;
+			std::cout << "Max " << name << ' ' << m_maxValues.*field << std::endl;
+			std::cout << "Min " << name << ' ' << m_minValues.*field << std::endl;
+			std::cout << "Average " << name << ' ' << (m_accValues.*field / m_countAcc) << std::endl;
+			std::cout << "----------------" << std::endl;
+		}
 	}
 
-	double m_minTemperature = std::numeric_limits<double>::infinity();
-	double m_maxTemperature = -std::numeric_limits<double>::infinity();
-	double m_accTemperature = 0;
+	SWeatherInfo m_minValues;
+	SWeatherInfo m_maxValues;
+	SWeatherInfo m_accValues;
 	unsigned m_countAcc = 0;
 
+	constexpr static auto FIELD_NAME_PAIRS = {
+		std::pair(&SWeatherInfo::temperature, "Temp"),
+		std::pair(&SWeatherInfo::humidity, "Hum"),
+		std::pair(&SWeatherInfo::pressure, "Pressure")
+	};
 };
 
 class CWeatherData : public CObservable<SWeatherInfo>
