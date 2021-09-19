@@ -1,7 +1,7 @@
 ﻿#pragma once
 
+#include <map>
 #include <set>
-#include <functional>
 
 /*
 Шаблонный интерфейс IObserver. Его должен реализовывать класс, 
@@ -26,7 +26,7 @@ class IObservable
 {
 public:
 	virtual ~IObservable() = default;
-	virtual void RegisterObserver(IObserver<T> & observer) = 0;
+	virtual void RegisterObserver(IObserver<T> & observer, int priority = 0) = 0;
 	virtual void NotifyObservers() = 0;
 	virtual void RemoveObserver(IObserver<T> & observer) = 0;
 };
@@ -38,9 +38,12 @@ class CObservable : public IObservable<T>
 public:
 	typedef IObserver<T> ObserverType;
 
-	void RegisterObserver(ObserverType & observer) override
+	void RegisterObserver(ObserverType & observer, int priority = 0) override
 	{
-		m_observers.insert(&observer);
+		if (m_observerPriorityMap.try_emplace(&observer, priority).second)
+		{
+			m_observers.emplace(&observer, priority);
+		}
 	}
 
 	void NotifyObservers() override
@@ -48,13 +51,18 @@ public:
 		T data = GetChangedData();
 		for (auto & observer : m_observers)
 		{
-			observer->Update(data);
+			observer.observer->Update(data);
 		}
 	}
 
 	void RemoveObserver(ObserverType & observer) override
 	{
-		m_observers.erase(&observer);
+		auto it = m_observerPriorityMap.find(&observer);
+		if (it != m_observerPriorityMap.end())
+		{
+			m_observers.erase(ObserverPriority(*it));
+			m_observerPriorityMap.erase(it);
+		}
 	}
 
 protected:
@@ -63,5 +71,28 @@ protected:
 	virtual T GetChangedData()const = 0;
 
 private:
-	std::set<ObserverType *> m_observers;
+	struct ObserverPriority
+	{
+		ObserverType *const observer;
+		const int priority;
+
+		constexpr ObserverPriority(ObserverType * observer, int priority)
+			: observer(observer)
+			, priority(priority)
+		{
+		}
+		constexpr ObserverPriority(std::pair<ObserverType *, int> const& pair)
+			: observer(pair.first)
+			, priority(pair.second)
+		{
+		}
+
+		bool operator >(ObserverPriority const& other)const
+		{
+			return priority != other.priority ? priority > other.priority : observer < other.observer;
+		}
+	};
+
+	std::set<ObserverPriority, std::greater<ObserverPriority>> m_observers;
+	std::map<ObserverType *, int> m_observerPriorityMap;
 };
