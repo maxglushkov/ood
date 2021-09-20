@@ -2,38 +2,52 @@
 #include <catch2/catch.hpp>
 #include "WeatherData.h"
 
-class CLoggingObserver : public IObserver<SWeatherInfo>
+class CCallbackObserver : public IObserver<SWeatherInfo>
 {
 public:
-	static std::string GetLog()
+	using Callback = std::function<void(IObservable<SWeatherInfo> const*)>;
+
+	CCallbackObserver(Callback callback)
+		: m_callback(callback)
 	{
-		return m_log.str();
 	}
-
 private:
-	static std::stringstream m_log;
+	Callback m_callback;
 
-	void Update(SWeatherInfo const& data) override
+	void Update(IObservable<SWeatherInfo> const& sender, SWeatherInfo const& data) override
 	{
-		m_log << data.location << std::endl;
+		m_callback(&sender);
 	}
 };
 
-std::stringstream CLoggingObserver::m_log;
-
 TEST_CASE("Observing several data sources")
 {
-	CWeatherData wdIn("in");
-	CWeatherData wdOut("out");
+	CWeatherData wds[2];
+	std::vector<IObservable<SWeatherInfo> const*> log;
 
-	CLoggingObserver loggingObserver;
-	wdIn.RegisterObserver(loggingObserver);
-	wdOut.RegisterObserver(loggingObserver);
-	REQUIRE(loggingObserver.GetLog().empty());
+	CCallbackObserver observer(
+		[&](auto sender)
+		{
+			log.push_back(sender);
+		}
+	);
+	for (auto & wd : wds)
+	{
+		wd.RegisterObserver(observer);
+	}
+	REQUIRE(log.empty());
 
-	wdOut.SetMeasurements(1.85, 1, 720);
-	wdIn.SetMeasurements(16.85, 0.9, 720);
-	wdIn.SetMeasurements(16.85, 0.9, 730);
-	wdOut.SetMeasurements(6.85, 0.98, 730);
-	REQUIRE(loggingObserver.GetLog() == "out\nin\nin\nout\n");
+	wds[1].SetMeasurements(1.85, 1, 720);
+	wds[0].SetMeasurements(16.85, 0.9, 720);
+	wds[0].SetMeasurements(16.85, 0.9, 730);
+	wds[1].SetMeasurements(6.85, 0.98, 730);
+	REQUIRE(
+		log == std::vector<IObservable<SWeatherInfo> const*>
+		{
+			&wds[1],
+			&wds[0],
+			&wds[0],
+			&wds[1]
+		}
+	);
 }
