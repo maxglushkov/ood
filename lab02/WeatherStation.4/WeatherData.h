@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <iostream>
+#include <map>
 #include <vector>
 #include <algorithm>
 #include <climits>
@@ -7,9 +8,10 @@
 
 struct SWeatherInfo
 {
-	double temperature = 0;
-	double humidity = 0;
-	double pressure = 0;
+	std::string const& location;
+	double temperature;
+	double humidity;
+	double pressure;
 };
 
 class CDisplay: public IObserver<SWeatherInfo>
@@ -21,6 +23,10 @@ private:
 	*/
 	void Update(SWeatherInfo const& data) override
 	{
+		if (!data.location.empty())
+		{
+			std::cout << "Weather Station " << data.location << std::endl;
+		}
 		std::cout << "Current Temp " << data.temperature << std::endl;
 		std::cout << "Current Hum " << data.humidity << std::endl;
 		std::cout << "Current Pressure " << data.pressure << std::endl;
@@ -37,33 +43,60 @@ private:
 	*/
 	void Update(SWeatherInfo const& data) override
 	{
-		if (m_minTemperature > data.temperature)
-		{
-			m_minTemperature = data.temperature;
-		}
-		if (m_maxTemperature < data.temperature)
-		{
-			m_maxTemperature = data.temperature;
-		}
-		m_accTemperature += data.temperature;
-		++m_countAcc;
-
-		std::cout << "Max Temp " << m_maxTemperature << std::endl;
-		std::cout << "Min Temp " << m_minTemperature << std::endl;
-		std::cout << "Average Temp " << (m_accTemperature / m_countAcc) << std::endl;
-		std::cout << "----------------" << std::endl;
+		Update1(data.location, "Temp", data.temperature);
+		Update1(data.location, "Hum", data.humidity);
+		Update1(data.location, "Pressure", data.pressure);
 	}
 
-	double m_minTemperature = std::numeric_limits<double>::infinity();
-	double m_maxTemperature = -std::numeric_limits<double>::infinity();
-	double m_accTemperature = 0;
-	unsigned m_countAcc = 0;
+	template <typename... Args>
+	void Update1(std::string location, const char * name, Args ...data)
+	{
+		if (!location.empty())
+		{
+			location.push_back(' ');
+		}
+		location += name;
+		m_genericStats[location].Update(location, data...);
+	}
 
+	class CGenericStats
+	{
+	public:
+		void Update(std::string const& name, double data)
+		{
+			if (m_min > data)
+			{
+				m_min = data;
+			}
+			if (m_max < data)
+			{
+				m_max = data;
+			}
+			m_acc += data;
+			++m_count;
+
+			std::cout << "Max " << name << ' ' << m_max << std::endl;
+			std::cout << "Min " << name << ' ' << m_min << std::endl;
+			std::cout << "Average " << name << ' ' << (m_acc / m_count) << std::endl;
+			std::cout << "----------------" << std::endl;
+		}
+	private:
+		double m_min = std::numeric_limits<double>::infinity();
+		double m_max = -std::numeric_limits<double>::infinity();
+		double m_acc = 0;
+		unsigned m_count = 0;
+	};
+	std::map<std::string, CGenericStats> m_genericStats;
 };
 
 class CWeatherData : public CObservable<SWeatherInfo>
 {
 public:
+	CWeatherData(std::string const& location = std::string())
+		: m_location(location)
+	{
+	}
+
 	// Температура в градусах Цельсия
 	double GetTemperature()const
 	{
@@ -96,13 +129,15 @@ public:
 protected:
 	SWeatherInfo GetChangedData()const override
 	{
-		SWeatherInfo info;
-		info.temperature = GetTemperature();
-		info.humidity = GetHumidity();
-		info.pressure = GetPressure();
-		return info;
+		return {
+			.location = m_location,
+			.temperature = GetTemperature(),
+			.humidity = GetHumidity(),
+			.pressure = GetPressure()
+		};
 	}
 private:
+	std::string m_location;
 	double m_temperature = 0.0;
 	double m_humidity = 0.0;
 	double m_pressure = 760.0;
