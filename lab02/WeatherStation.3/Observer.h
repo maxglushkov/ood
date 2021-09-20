@@ -40,16 +40,25 @@ public:
 
 	void RegisterObserver(ObserverType & observer, int priority = 0) override
 	{
-		if (m_observerPriorityMap.try_emplace(&observer, priority).second)
+		auto [it, isInserted] = m_observerPriorityMap.try_emplace(&observer, priority);
+		if (isInserted)
 		{
-			m_observers.emplace(&observer, priority);
+			try
+			{
+				m_observers.emplace(&observer, priority);
+			}
+			catch (...)
+			{
+				m_observerPriorityMap.erase(it);
+				throw;
+			}
 		}
 	}
 
 	void NotifyObservers() override
 	{
 		T data = GetChangedData();
-		for (auto & observer : m_observers)
+		for (auto & observer : std::set(m_observers))
 		{
 			observer.observer->Update(data);
 		}

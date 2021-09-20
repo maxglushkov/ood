@@ -46,11 +46,8 @@ public:
 	void NotifyObservers() override
 	{
 		T data = GetChangedData();
-		auto it = m_observers.begin();
-		while (it != m_observers.end())
+		for (auto & observer : std::set(m_observers))
 		{
-			ObserverType *const observer = *it;
-			++it;
 			observer->Update(data);
 		}
 	}
