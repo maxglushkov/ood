@@ -5,17 +5,35 @@ int main()
 	CWeatherData wd;
 
 	CDisplay display;
-	wd.RegisterObserver(display);
+	wd.RegisterObserver(display, CWeatherData::Events()
+		.set(SWeatherInfo::Temperature)
+		.set(SWeatherInfo::Pressure));
 
 	CStatsDisplay statsDisplay;
-	wd.RegisterObserver(statsDisplay);
+	wd.RegisterObserver(statsDisplay, CWeatherData::Events()
+		.set(SWeatherInfo::Temperature)
+		.set(SWeatherInfo::WindDirection));
 
-	wd.SetMeasurements(3, 0.7, 760, 4, 90);
-	wd.SetMeasurements(4, 0.8, 761, 5, 270);
+	wd.SetTemperatureMeasurements(3);
+	wd.SetHumidityMeasurements(0.7);
+	wd.SetPressureMeasurements(760);
+	wd.SetWindMeasurements(4, 90);
 
-	wd.RemoveObserver(statsDisplay);
+	wd.RegisterObserver(statsDisplay, CWeatherData::Events()
+		.set(SWeatherInfo::Temperature)
+		.set(SWeatherInfo::Humidity));
 
-	wd.SetMeasurements(10, 0.8, 761, 3, 180);
-	wd.SetMeasurements(-10, 0.8, 761, 0, 0);
+	wd.SetTemperatureMeasurements(4);
+	wd.SetHumidityMeasurements(0.8);
+	wd.SetPressureMeasurements(761);
+	wd.SetWindMeasurements(5, 270);
+
+	wd.UnregisterObserver(statsDisplay, CWeatherData::Events().set(SWeatherInfo::Temperature));
+
+	wd.SetTemperatureMeasurements(10);
+	wd.SetWindMeasurements(3, 180);
+
+	wd.SetTemperatureMeasurements(-10);
+	wd.SetWindMeasurements(0, 0);
 	return 0;
 }
