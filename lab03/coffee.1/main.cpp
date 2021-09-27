@@ -271,4 +271,24 @@ int main()
 	PrintBeverageInfo(CMilkshake(MilkshakePortion::Small));
 	PrintBeverageInfo(CMilkshake(MilkshakePortion::Medium));
 	PrintBeverageInfo(CMilkshake(MilkshakePortion::Large));
+
+	cout << endl;
+	PrintBeverageInfo(CCoffee());
+	PrintBeverageInfo(*(make_unique<CCoffee>()
+		<< MakeCondiment<CCream>()));
+	PrintBeverageInfo(*(make_unique<CCoffee>()
+		<< MakeCondiment<CLiqueur>(LiqueurType::Nut)));
+	PrintBeverageInfo(*(make_unique<CCoffee>()
+		<< MakeCondiment<CLiqueur>(LiqueurType::Chocolate)));
+	PrintBeverageInfo(*(make_unique<CCoffee>()
+		<< MakeCondiment<CChocolateBar>(5)));
+	try
+	{
+		PrintBeverageInfo(*(make_unique<CCoffee>()
+			<< MakeCondiment<CChocolateBar>(6)));
+	}
+	catch (std::exception & e)
+	{
+		cerr << "Error: " << e.what() << endl;
+	}
 }
