@@ -160,6 +160,10 @@ void DialogWithUser()
 	cout << beverage->GetDescription() << ", cost: " << beverage->GetCost() << endl;
 }
 
+void PrintBeverageInfo(IBeverage const& beverage)
+{
+	cout << beverage.GetDescription() << " costs " << beverage.GetCost() << endl;
+}
 
 int main()
 {
@@ -178,7 +182,7 @@ int main()
 		auto beverage = make_unique<CChocolateCrumbs>(move(iceCubes), 2);
 
 		// Выписываем счет покупателю
-		cout << beverage->GetDescription() << " costs " << beverage->GetCost() << endl;
+		PrintBeverageInfo(*beverage);
 	}
 
 	{
@@ -193,7 +197,7 @@ int main()
 				2);									// 2 грамма шоколадной крошки
 
 		// Выписываем счет покупателю
-		cout << beverage->GetDescription() << " costs " << beverage->GetCost() << endl;
+		PrintBeverageInfo(*beverage);
 	}
 
 	// Подробнее рассмотрим работу MakeCondiment и оператора <<
@@ -215,6 +219,7 @@ int main()
 					2), 
 				2, IceCubeType::Water);
 		*/
+		PrintBeverageInfo(*lemonIceTea);
 
 		auto oneMoreLemonIceTea =
 			make_unique<CTea>()	// Берем чай
@@ -227,6 +232,7 @@ int main()
 				MakeCondiment<CLemon>(2)(make_unique<CTea>())
 				);
 		*/
+		PrintBeverageInfo(*oneMoreLemonIceTea);
 	}
 
 	// Аналог предыдущего решения с добавкой синтаксического сахара
@@ -240,7 +246,7 @@ int main()
 			<< MakeCondiment<CChocolateCrumbs>(2);			// посыпаем шоколадной крошкой
 
 		// Выписываем счет покупателю
-		cout << beverage->GetDescription() << " costs " << beverage->GetCost() << endl;
+		PrintBeverageInfo(*beverage);
 	}
 
 	{
@@ -250,6 +256,19 @@ int main()
 			<< MakeCondiment<CCoconutFlakes>(8);		// посыпаем кокосовой стружкой
 
 		// Выписываем счет покупателю
-		cout << beverage->GetDescription() << " costs " << beverage->GetCost() << endl;
+		PrintBeverageInfo(*beverage);
 	}
+
+	cout << endl;
+	PrintBeverageInfo(CLatte(CoffeePortion::Standard));
+	PrintBeverageInfo(CLatte(CoffeePortion::Double));
+	PrintBeverageInfo(CCappuccino(CoffeePortion::Standard));
+	PrintBeverageInfo(CCappuccino(CoffeePortion::Double));
+	PrintBeverageInfo(CIvanChai());
+	PrintBeverageInfo(CGeorgianTea());
+	PrintBeverageInfo(CAzerbaijaniTea());
+	PrintBeverageInfo(CKrasnodarTea());
+	PrintBeverageInfo(CMilkshake(MilkshakePortion::Small));
+	PrintBeverageInfo(CMilkshake(MilkshakePortion::Medium));
+	PrintBeverageInfo(CMilkshake(MilkshakePortion::Large));
 }
