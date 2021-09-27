@@ -1,9 +1,6 @@
 ﻿#pragma once
-#include <cassert>
 #include <cmath>
 #include <iostream>
-#include <map>
-#include <memory>
 #include "Observer.h"
 
 struct SWeatherInfo
@@ -19,51 +16,37 @@ struct SWeatherInfo
 	std::unique_ptr<SWind> wind;
 };
 
-class CDisplay: public IObserver<SWeatherInfo>
+static void Display(IObservable<SWeatherInfo> const& sender, SWeatherInfo const& data)
 {
-private:
-	/* Метод Update сделан приватным, чтобы ограничить возможность его вызова напрямую
-		Классу CObservable он будет доступен все равно, т.к. в интерфейсе IObserver он
-		остается публичным
-	*/
-	void Update(IObservable<SWeatherInfo> const& sender, SWeatherInfo const& data) override
+	std::cout << "Weather Station " << &sender << std::endl;
+	std::cout << "Current Temp " << data.temperature << std::endl;
+	std::cout << "Current Hum " << data.humidity << std::endl;
+	std::cout << "Current Pressure " << data.pressure << std::endl;
+	if (data.wind)
+	{
+		std::cout << "Current Wind Speed " << data.wind->speed << std::endl;
+		std::cout << "Current Wind Direction " << data.wind->direction << std::endl;
+	}
+	std::cout << "----------------" << std::endl;
+}
+
+struct StatsDisplay
+{
+public:
+	void operator()(IObservable<SWeatherInfo> const& sender, SWeatherInfo const& data)
 	{
 		std::cout << "Weather Station " << &sender << std::endl;
-		std::cout << "Current Temp " << data.temperature << std::endl;
-		std::cout << "Current Hum " << data.humidity << std::endl;
-		std::cout << "Current Pressure " << data.pressure << std::endl;
+		temperature.Update("Temp", data.temperature);
+		humidity.Update("Hum", data.humidity);
+		pressure.Update("Pressure", data.pressure);
 		if (data.wind)
 		{
-			std::cout << "Current Wind Speed " << data.wind->speed << std::endl;
-			std::cout << "Current Wind Direction " << data.wind->direction << std::endl;
+			windSpeed.Update("Wind Speed", data.wind->speed);
+			windDirection.Update("Wind Direction", data.wind->speed, data.wind->direction);
 		}
-		std::cout << "----------------" << std::endl;
 	}
-};
 
-class CStatsDisplay : public IObserver<SWeatherInfo>
-{
 private:
-	/* Метод Update сделан приватным, чтобы ограничить возможность его вызова напрямую
-	Классу CObservable он будет доступен все равно, т.к. в интерфейсе IObserver он
-	остается публичным
-	*/
-	void Update(IObservable<SWeatherInfo> const& sender, SWeatherInfo const& data) override
-	{
-		auto & stats = m_stats.try_emplace(&sender, bool(data.wind)).first->second;
-
-		stats.temperature.Update("Temp", data.temperature);
-		stats.humidity.Update("Hum", data.humidity);
-		stats.pressure.Update("Pressure", data.pressure);
-
-		assert(bool(data.wind) == bool(stats.wind));
-		if (data.wind)
-		{
-			stats.wind->speed.Update("Wind Speed", data.wind->speed);
-			stats.wind->direction.Update("Wind Direction", data.wind->speed, data.wind->direction);
-		}
-	}
-
 	class CGenericStats
 	{
 	public:
@@ -90,7 +73,8 @@ private:
 		double m_max = -std::numeric_limits<double>::infinity();
 		double m_acc = 0;
 		unsigned m_count = 0;
-	};
+	}
+	temperature, humidity, pressure, windSpeed;
 
 	class CPolarAngleStats
 	{
@@ -111,28 +95,8 @@ private:
 		}
 	private:
 		double m_accX = 0, m_accY = 0;
-	};
-
-	struct Stats
-	{
-		struct Wind
-		{
-			CGenericStats speed;
-			CPolarAngleStats direction;
-		};
-		Stats(bool hasWindSensors)
-		{
-			if (hasWindSensors)
-			{
-				wind = std::make_unique<Wind>();
-			}
-		}
-		CGenericStats temperature;
-		CGenericStats humidity;
-		CGenericStats pressure;
-		std::unique_ptr<Wind> wind;
-	};
-	std::map<IObservable<SWeatherInfo> const*, Stats> m_stats;
+	}
+	windDirection;
 };
 
 class CWeatherData : public CObservable<SWeatherInfo>

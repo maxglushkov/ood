@@ -4,13 +4,11 @@ int main()
 {
 	CWeatherData wdIn, wdOut(true);
 
-	CDisplay display;
-	wdOut.RegisterObserver(display);
-	wdIn.RegisterObserver(display);
+	wdOut.RegisterObserver(Display);
+	wdIn.RegisterObserver(Display);
 
-	CStatsDisplay statsDisplay;
-	wdOut.RegisterObserver(statsDisplay);
-	wdIn.RegisterObserver(statsDisplay);
+	const auto outStatsConn = wdOut.RegisterObserver(StatsDisplay());
+	const auto inStatsConn = wdIn.RegisterObserver(StatsDisplay());
 
 	wdOut.SetMeasurements(3, 0.7, 760);
 	wdIn.SetMeasurements(23, 0.5, 760);
@@ -20,8 +18,7 @@ int main()
 	wdIn.SetMeasurements(24, 0.6, 761);
 	wdOut.SetWindMeasurements(5, 270);
 
-	wdOut.RemoveObserver(statsDisplay);
-	wdIn.RemoveObserver(statsDisplay);
+	outStatsConn.disconnect();
 
 	wdOut.SetMeasurements(10, 0.8, 761);
 	wdOut.SetWindMeasurements(3, 180);

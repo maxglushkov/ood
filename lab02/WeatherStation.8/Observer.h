@@ -1,24 +1,6 @@
 ﻿#pragma once
-
-#include <set>
-#include <functional>
-
-template <typename T>
-class IObservable;
-
-/*
-Шаблонный интерфейс IObserver. Его должен реализовывать класс, 
-желающий получать уведомления от соответствующего IObservable
-Параметром шаблона является тип аргумента,
-передаваемого Наблюдателю в метод Update
-*/
-template <typename T>
-class IObserver
-{
-public:
-	virtual void Update(IObservable<T> const& sender, T const& data) = 0;
-	virtual ~IObserver() = default;
-};
+#include <boost/signals2/signal.hpp>
+namespace bs2 = boost::signals2;
 
 /*
 Шаблонный интерфейс IObservable. Позволяет подписаться и отписаться на оповещения, а также
@@ -28,10 +10,12 @@ template <typename T>
 class IObservable
 {
 public:
+	using Signal = bs2::signal<void(IObservable const& sender, T const& data)>;
+	using Slot = typename Signal::slot_type;
+
 	virtual ~IObservable() = default;
-	virtual void RegisterObserver(IObserver<T> & observer) = 0;
+	virtual bs2::connection RegisterObserver(Slot const& slot) = 0;
 	virtual void NotifyObservers() = 0;
-	virtual void RemoveObserver(IObserver<T> & observer) = 0;
 };
 
 // Реализация интерфейса IObservable
@@ -39,25 +23,17 @@ template <class T>
 class CObservable : public IObservable<T>
 {
 public:
-	typedef IObserver<T> ObserverType;
+	typedef typename IObservable<T>::Signal Signal;
+	typedef typename IObservable<T>::Slot Slot;
 
-	void RegisterObserver(ObserverType & observer) override
+	bs2::connection RegisterObserver(Slot const& slot) override
 	{
-		m_observers.insert(&observer);
+		return m_signal.connect(slot);
 	}
 
 	void NotifyObservers() override
 	{
-		T data = GetChangedData();
-		for (auto & observer : m_observers)
-		{
-			observer->Update(*this, data);
-		}
-	}
-
-	void RemoveObserver(ObserverType & observer) override
-	{
-		m_observers.erase(&observer);
+		m_signal(*this, GetChangedData());
 	}
 
 protected:
@@ -66,5 +42,5 @@ protected:
 	virtual T GetChangedData()const = 0;
 
 private:
-	std::set<ObserverType *> m_observers;
+	Signal m_signal;
 };
