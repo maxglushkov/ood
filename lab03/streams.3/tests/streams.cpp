@@ -1,42 +1,8 @@
 #include <catch2/catch.hpp>
 #include <filesystem>
+#include "stream-tester.hpp"
 #include "../file-stream.hpp"
 #include "../memory-stream.hpp"
-
-class CStreamTester
-{
-public:
-	static void TestRead(IInputDataStream & input)
-	{
-		uint8_t block[sizeof PHRASE];
-		REQUIRE(input.ReadBlock(block, sizeof block) == sizeof block);
-		REQUIRE(memcmp(block, PHRASE, sizeof PHRASE) == 0);
-		REQUIRE(input.ReadByte() == 0);
-		REQUIRE_THROWS(input.ReadByte());
-		REQUIRE(input.ReadBlock(block, sizeof block) == 0);
-	}
-
-	static void TestWrite(IOutputDataStream & output)
-	{
-		output.WriteBlock(PHRASE, sizeof PHRASE);
-		output.WriteByte(0);
-	}
-
-	static std::vector<uint8_t> GetTestData()
-	{
-		std::vector<uint8_t> data(PHRASE, PHRASE + sizeof PHRASE);
-		data.push_back(0);
-		return data;
-	}
-
-	static size_t GetTestDataSize()
-	{
-		return sizeof PHRASE + 1;
-	}
-
-private:
-	constexpr static uint8_t PHRASE[] = {0xde, 0xad, 0xbe, 0xef};
-};
 
 TEST_CASE("Testing file streams")
 {

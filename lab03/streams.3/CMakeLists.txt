@@ -7,7 +7,13 @@ set(CMAKE_CXX_EXTENSIONS NO)
 enable_testing()
 add_subdirectory(tests)
 
+add_library(
+	testable OBJECT
+	crypt-decorator.cpp
+)
+
 add_executable(
 	streams
 	main.cpp
+	$<TARGET_OBJECTS:testable>
 )
