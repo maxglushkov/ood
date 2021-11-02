@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.9.2)
+project(painter VERSION 0.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED NO)
+set(CMAKE_CXX_EXTENSIONS NO)
+
+enable_testing()
+
+add_subdirectory(libpainter)
+add_subdirectory(libpainter-tests)
+add_subdirectory(painter)
