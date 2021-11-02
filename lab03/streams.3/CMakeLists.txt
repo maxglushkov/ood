@@ -9,6 +9,7 @@ add_subdirectory(tests)
 
 add_library(
 	testable OBJECT
+	compress-decorator.cpp
 	crypt-decorator.cpp
 )
 

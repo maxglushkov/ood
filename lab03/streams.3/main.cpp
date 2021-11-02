@@ -4,6 +4,7 @@
 #include <optional>
 #include <queue>
 #include <stack>
+#include "compress-decorator.hpp"
 #include "crypt-decorator.hpp"
 #include "file-stream.hpp"
 
@@ -76,6 +77,16 @@ int main(int argc, char const* argv[])
 					continue;
 				}
 			}
+		}
+		else if (*arg == "--compress"s)
+		{
+			outputWrappers.push(GenerateDecorator<IOutputDataStream, CCompressOutputStream>());
+			continue;
+		}
+		else if (*arg == "--decompress"s)
+		{
+			inputWrappers.push(GenerateDecorator<IInputDataStream, CDecompressInputStream>());
+			continue;
 		}
 		PrintUsage(*argv);
 		return 1;
