@@ -23,8 +23,6 @@ public:
 		}
 	}
 
-	void Draw(ICanvas & canvas)const override;
-
 	unsigned GetVertexCount()const
 	{
 		return m_vertexCount;
@@ -44,4 +42,6 @@ private:
 	unsigned m_vertexCount;
 	Point m_center;
 	double m_outerRadius;
+
+	void DrawOutline(ICanvas & canvas)const override;
 };

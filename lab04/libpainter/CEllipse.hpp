@@ -16,8 +16,6 @@ public:
 		}
 	}
 
-	void Draw(ICanvas & canvas)const override;
-
 	Point GetCenter()const
 	{
 		return m_center;
@@ -36,4 +34,6 @@ public:
 private:
 	Point m_center;
 	double m_horizontalRadius, m_verticalRadius;
+
+	void DrawOutline(ICanvas & canvas)const override;
 };

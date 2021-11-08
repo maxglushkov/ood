@@ -6,9 +6,10 @@ class CShape
 public:
 	virtual ~CShape() = default;
 
-	virtual void Draw(ICanvas & canvas)const
+	void Draw(ICanvas & canvas)const
 	{
 		canvas.SetColor(m_color);
+		DrawOutline(canvas);
 	}
 
 	Color GetColor()const
@@ -23,4 +24,6 @@ protected:
 
 private:
 	Color m_color;
+
+	virtual void DrawOutline(ICanvas & canvas)const = 0;
 };

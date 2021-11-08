@@ -1,8 +1,7 @@
 #include "CRegularPolygon.hpp"
 
-void CRegularPolygon::Draw(ICanvas & canvas)const
+void CRegularPolygon::DrawOutline(ICanvas & canvas)const
 {
-	CShape::Draw(canvas);
 	const double sideLengthInRadians = 2 * M_PI / m_vertexCount;
 	Point first = {m_center.x + m_outerRadius, m_center.y};
 	for (unsigned vertex = 1; vertex < m_vertexCount; ++vertex)

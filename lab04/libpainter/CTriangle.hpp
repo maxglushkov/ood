@@ -9,8 +9,6 @@ public:
 		,m_vertices{vertex1, vertex2, vertex3}
 	{}
 
-	void Draw(ICanvas & canvas)const override;
-
 	Point GetVertex1()const
 	{
 		return m_vertices[0];
@@ -28,4 +26,6 @@ public:
 
 private:
 	Point m_vertices[3];
+
+	void DrawOutline(ICanvas & canvas)const override;
 };

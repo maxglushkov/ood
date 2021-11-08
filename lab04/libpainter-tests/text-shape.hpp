@@ -12,6 +12,9 @@ struct TextShape: public CShape
 
 private:
 	std::string m_text;
+
+	void DrawOutline([[maybe_unused]] ICanvas & canvas)const override
+	{}
 };
 
 inline std::string const& GetShapeText(CShape const& shape)

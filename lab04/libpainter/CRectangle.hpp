@@ -10,8 +10,6 @@ public:
 		,m_rightBottom{std::max(x1, x2), std::max(y1, y2)}
 	{}
 
-	void Draw(ICanvas & canvas)const override;
-
 	Point GetLeftTop()const
 	{
 		return m_leftTop;
@@ -24,4 +22,6 @@ public:
 
 private:
 	Point m_leftTop, m_rightBottom;
+
+	void DrawOutline(ICanvas & canvas)const override;
 };
