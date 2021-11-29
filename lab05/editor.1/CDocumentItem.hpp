@@ -7,8 +7,22 @@
 class CDocumentItem : public CConstDocumentItem
 {
 public:
+	CDocumentItem(Item && item)
+		:CConstDocumentItem(std::move(item))
+	{}
+
+	using CConstDocumentItem::GetImage;
+	using CConstDocumentItem::GetParagraph;
+
 	// Возвращает указатель на изображение, либо nullptr, если элемент не является изображением
-	std::shared_ptr<IImage> GetImage();
+	std::shared_ptr<IImage> GetImage()
+	{
+		return Get<IImage>();
+	}
+
 	// Возвращает указатель на параграф, либо nullptr, если элемент не является параграфом
-	std::shared_ptr<IParagraph> GetParagraph();
+	std::shared_ptr<IParagraph> GetParagraph()
+	{
+		return Get<IParagraph>();
+	}
 };

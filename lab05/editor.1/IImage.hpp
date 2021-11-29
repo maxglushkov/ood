@@ -20,3 +20,5 @@ public:
 
 	virtual ~IImage() = default;
 };
+
+typedef std::shared_ptr<IImage> IImagePtr;

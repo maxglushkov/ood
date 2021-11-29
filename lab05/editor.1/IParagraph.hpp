@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <memory>
 
 /* Параграф текста*/
 class IParagraph
@@ -9,3 +9,5 @@ public:
 	virtual void SetText(std::string const& text) = 0;
 	virtual ~IParagraph() = default;
 };
+
+typedef std::shared_ptr<IParagraph> IParagraphPtr;
