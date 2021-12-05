@@ -4,6 +4,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED NO)
 set(CMAKE_CXX_EXTENSIONS NO)
 
+enable_testing()
+add_subdirectory(tests)
+
 add_executable(
 	GumballMachine
 	main.cpp
