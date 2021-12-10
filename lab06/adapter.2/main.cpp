@@ -1,4 +1,4 @@
-﻿#include "modern-graphics-lib.hpp"
+﻿#include "modern-adapter.hpp"
 #include "shape-drawing-lib.hpp"
 using namespace std;
 
@@ -25,10 +25,9 @@ void PaintPictureOnCanvas()
 
 void PaintPictureOnModernGraphicsRenderer()
 {
-	modern_graphics_lib::CModernGraphicsRenderer renderer(cout);
-
-	// TODO: при помощи существующей функции PaintPicture() нарисовать
-	// картину на renderer
+	CModernGraphicsCanvas modernCanvas(cout);
+	shape_drawing_lib::CCanvasPainter painter(modernCanvas);
+	PaintPicture(painter);
 }
 }
 
