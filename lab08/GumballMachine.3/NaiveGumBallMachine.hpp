@@ -86,6 +86,15 @@ public:
 		}
 	}
 
+	void Refill(unsigned numBalls)
+	{
+		m_ballCount = numBalls;
+		m_state =
+			m_ballCount == 0    ? State::SoldOut :
+			m_quarterCount == 0 ? State::NoQuarter :
+			                      State::HasQuarter;
+	}
+
 	std::string ToString() const
 	{
 		std::string state =

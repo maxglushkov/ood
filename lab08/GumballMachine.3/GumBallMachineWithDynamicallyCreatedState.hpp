@@ -38,6 +38,24 @@ public:
 		m_currentState->TurnCrank();
 		m_currentState->Dispense();
 	}
+	void Refill(unsigned numBalls)
+	{
+		if (m_ballCount == 0)
+		{
+			if (numBalls != 0)
+			{
+				m_quarterCount == 0 ? SetNoQuarterState() : SetHasQuarterState();
+			}
+		}
+		else
+		{
+			if (numBalls == 0)
+			{
+				SetSoldOutState();
+			}
+		}
+		m_ballCount = numBalls;
+	}
 	std::string ToString() const
 	{
 		auto fmt = boost::format(R"(

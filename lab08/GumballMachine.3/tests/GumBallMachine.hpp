@@ -113,3 +113,58 @@ TEST_CASE(TEST_SUITE_NAME": SoldOut x TurnCrank -> SoldOut")
 	machine.TurnCrank();
 	TestMachineState(machine, State::SoldOut, 0, 0);
 }
+
+TEST_CASE(TEST_SUITE_NAME": SoldOut x Refill(0) -> SoldOut")
+{
+	CGumballMachine machine(0);
+	machine.Refill(0);
+	TestMachineState(machine, State::SoldOut, 0, 0);
+}
+
+TEST_CASE(TEST_SUITE_NAME": SoldOut, 0, 0 x Refill(1) -> NoQuarter, 1, 0")
+{
+	CGumballMachine machine(0);
+	machine.Refill(1);
+	TestMachineState(machine, State::NoQuarter, 1, 0);
+}
+
+TEST_CASE(TEST_SUITE_NAME": SoldOut, 0, 1 x Refill(1) -> HasQuarter, 1, 1")
+{
+	CGumballMachine machine(1);
+	machine.InsertQuarter();
+	machine.InsertQuarter();
+	machine.TurnCrank();
+	TestMachineState(machine, State::SoldOut, 0, 1);
+	machine.Refill(1);
+	TestMachineState(machine, State::HasQuarter, 1, 1);
+}
+
+TEST_CASE(TEST_SUITE_NAME": NoQuarter, 1, 0 x Refill(0) -> SoldOut, 0, 0")
+{
+	CGumballMachine machine(1);
+	machine.Refill(0);
+	TestMachineState(machine, State::SoldOut, 0, 0);
+}
+
+TEST_CASE(TEST_SUITE_NAME": NoQuarter, 1, 0 x Refill(1) -> NoQuarter, 1, 0")
+{
+	CGumballMachine machine(1);
+	machine.Refill(1);
+	TestMachineState(machine, State::NoQuarter, 1, 0);
+}
+
+TEST_CASE(TEST_SUITE_NAME": HasQuarter, 1, 1 x Refill(0) -> SoldOut, 0, 1")
+{
+	CGumballMachine machine(1);
+	machine.InsertQuarter();
+	machine.Refill(0);
+	TestMachineState(machine, State::SoldOut, 0, 1);
+}
+
+TEST_CASE(TEST_SUITE_NAME": HasQuarter, 1, 1 x Refill(1) -> HasQuarter, 1, 1")
+{
+	CGumballMachine machine(1);
+	machine.InsertQuarter();
+	machine.Refill(1);
+	TestMachineState(machine, State::HasQuarter, 1, 1);
+}
