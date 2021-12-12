@@ -12,16 +12,17 @@ public:
 
 	void InsertQuarter() override
 	{
-		std::cout << "You can't insert another quarter\n";
+		m_gumballMachine.AddQuarter();
 	}
-	void EjectQuarter() override
+	void EjectQuarters() override
 	{
-		std::cout << "Quarter returned\n";
+		m_gumballMachine.ReturnQuarters();
 		m_gumballMachine.SetNoQuarterState();
 	}
 	void TurnCrank() override
 	{
 		std::cout << "You turned...\n";
+		m_gumballMachine.SellBall();
 		m_gumballMachine.SetSoldState();
 	}
 	void Dispense() override

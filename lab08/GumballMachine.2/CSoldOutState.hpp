@@ -14,9 +14,9 @@ public:
 	{
 		std::cout << "You can't insert a quarter, the machine is sold out\n";
 	}
-	void EjectQuarter() override
+	void EjectQuarters() override
 	{
-		std::cout << "You can't eject, you haven't inserted a quarter yet\n";
+		m_gumballMachine.ReturnQuarters();
 	}
 	void TurnCrank() override
 	{

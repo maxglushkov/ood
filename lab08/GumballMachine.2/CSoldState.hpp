@@ -10,17 +10,11 @@ public:
 		:m_gumballMachine(gumballMachine)
 	{}
 	void InsertQuarter() override
-	{
-		std::cout << "Please wait, we're already giving you a gumball\n";
-	}
-	void EjectQuarter() override
-	{
-		std::cout << "Sorry you already turned the crank\n";
-	}
+	{}
+	void EjectQuarters() override
+	{}
 	void TurnCrank() override
-	{
-		std::cout << "Turning twice doesn't get you another gumball\n";
-	}
+	{}
 	void Dispense() override
 	{
 		m_gumballMachine.ReleaseBall();
@@ -31,7 +25,14 @@ public:
 		}
 		else
 		{
-			m_gumballMachine.SetNoQuarterState();
+			if (m_gumballMachine.GetQuarterCount() == 0)
+			{
+				m_gumballMachine.SetNoQuarterState();
+			}
+			else
+			{
+				m_gumballMachine.SetHasQuarterState();
+			}
 		}
 	}
 	std::string ToString() const override

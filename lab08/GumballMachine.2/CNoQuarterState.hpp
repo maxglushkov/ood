@@ -12,10 +12,10 @@ public:
 
 	void InsertQuarter() override
 	{
-		std::cout << "You inserted a quarter\n";
+		m_gumballMachine.AddQuarter();
 		m_gumballMachine.SetHasQuarterState();
 	}
-	void EjectQuarter() override
+	void EjectQuarters() override
 	{
 		std::cout << "You haven't inserted a quarter\n";
 	}

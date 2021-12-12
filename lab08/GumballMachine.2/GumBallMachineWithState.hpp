@@ -11,22 +11,24 @@ namespace with_state
 class CGumballMachine : private IGumballMachine
 {
 public:
+	constexpr static unsigned MAX_QUARTER_COUNT = 5;
+
 	CGumballMachine(unsigned numBalls)
 		: m_soldState(*this)
 		, m_soldOutState(*this)
 		, m_noQuarterState(*this)
 		, m_hasQuarterState(*this)
 		, m_state(&m_soldOutState)
-		, m_count(numBalls)
+		, m_ballCount(numBalls)
 	{
-		if (m_count > 0)
+		if (m_ballCount > 0)
 		{
 			m_state = &m_noQuarterState;
 		}
 	}
-	void EjectQuarter()
+	void EjectQuarters()
 	{
-		m_state->EjectQuarter();
+		m_state->EjectQuarters();
 	}
 	void InsertQuarter()
 	{
@@ -43,21 +45,50 @@ public:
 Mighty Gumball, Inc.
 C++-enabled Standing Gumball Model #2016 (with state)
 Inventory: %1% gumball%2%
-Machine is %3%
+Quarters inserted: %3%
+Machine is %4%
 )");
-		return (fmt % m_count % (m_count != 1 ? "s" : "") % m_state->ToString()).str();
+		return (fmt % m_ballCount % (m_ballCount != 1 ? "s" : "") % m_quarterCount % m_state->ToString()).str();
 	}
 private:
 	unsigned GetBallCount() const override
 	{
-		return m_count;
+		return m_ballCount;
 	}
-	virtual void ReleaseBall() override
+	unsigned GetQuarterCount() const override
 	{
-		if (m_count != 0)
+		return m_quarterCount;
+	}
+	void AddQuarter() override
+	{
+		if (m_quarterCount < MAX_QUARTER_COUNT)
+		{
+			std::cout << "You inserted a quarter\n";
+			++m_quarterCount;
+		}
+		else
+		{
+			std::cout << "You can't insert another quarter\n";
+		}
+	}
+	void ReturnQuarters() override
+	{
+		std::cout << m_quarterCount << " quarter" << (m_quarterCount == 1 ? "" : "s") << " returned\n";
+		m_quarterCount = 0;
+	}
+	void SellBall() override
+	{
+		if (m_quarterCount != 0)
+		{
+			--m_quarterCount;
+		}
+	}
+	void ReleaseBall() override
+	{
+		if (m_ballCount != 0)
 		{
 			std::cout << "A gumball comes rolling out the slot...\n";
-			--m_count;
+			--m_ballCount;
 		}
 	}
 	void SetSoldOutState() override
@@ -77,7 +108,7 @@ private:
 		m_state = &m_hasQuarterState;
 	}
 
-	unsigned m_count = 0;
+	unsigned m_ballCount, m_quarterCount = 0;
 	CSoldState m_soldState;
 	CSoldOutState m_soldOutState;
 	CNoQuarterState m_noQuarterState;
