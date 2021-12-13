@@ -1,71 +1,67 @@
+#include "CGumballMachineMenu.hpp"
 #include "GumBallMachineWithDynamicallyCreatedState.hpp"
 #include "GumBallMachineWithState.hpp"
 #include "NaiveGumBallMachine.hpp"
 
 using namespace std;
 
-template <typename GumballMachineType>
-void TestGumballMachine(GumballMachineType & m)
+class CAppMenu: public CMenu
 {
-	cout << m.ToString() << endl;
-
-	m.InsertQuarter();
-	m.TurnCrank();
-
-	cout << m.ToString() << endl;
-
-	m.InsertQuarter();
-	m.EjectQuarters();
-	m.TurnCrank();
-
-	cout << m.ToString() << endl;
-
-	m.InsertQuarter();
-	m.TurnCrank();
-	m.InsertQuarter();
-	m.TurnCrank();
-	m.EjectQuarters();
-
-	cout << m.ToString() << endl;
-
-	m.InsertQuarter();
-	m.InsertQuarter();
-	m.TurnCrank();
-	m.InsertQuarter();
-	m.TurnCrank();
-	m.InsertQuarter();
-	m.TurnCrank();
-
-	cout << m.ToString() << endl;
-}
-
-void TestNaiveGumballMachine()
-{
-	naive::CGumballMachine m(5);
-	TestGumballMachine(m);
-}
-
-void TestGumballMachineWithState()
-{
-	with_state::CGumballMachine m(5);
-	TestGumballMachine(m);
-}
-
-void TestGumballMachineWithDynamicState()
-{
-	with_dynamic_state::CGumballMachine m(5);
-	TestGumballMachine(m);
-}
+public:
+	CAppMenu()
+		:CMenu{
+			{
+				"Naive",
+				"Use naive gumball machine",
+				[](CArguments &, std::ostream &)
+				{
+					naive::CGumballMachine m(5);
+					CGumballMachineMenu(m).Run(cin, cout, cerr);
+					return true;
+				}
+			}, {
+				"WithState",
+				"Use gumball machine with state",
+				[](CArguments &, std::ostream &)
+				{
+					with_state::CGumballMachine m(5);
+					CGumballMachineMenu(m).Run(cin, cout, cerr);
+					return true;
+				}
+			}, {
+				"WithDynState",
+				"Use gumball machine with dynamic state",
+				[](CArguments &, std::ostream &)
+				{
+					with_dynamic_state::CGumballMachine m(5);
+					CGumballMachineMenu(m).Run(cin, cout, cerr);
+					return true;
+				}
+			}, {
+				"Help",
+				"Display help",
+				[this](CArguments &, std::ostream & output)
+				{
+					for (auto & item: GetItems())
+					{
+						output << item.name << ": " << item.description << '\n';
+					}
+					return true;
+				}
+			}, {
+				"Exit",
+				"Quit",
+				[](CArguments &, std::ostream &)
+				{
+					return false;
+				}
+			}
+		}
+	{}
+};
 
 int main()
 {
-	TestNaiveGumballMachine();
-
-	cout << "\n-----------------\n";
-	TestGumballMachineWithState();
-
-	cout << "\n-----------------\n";
-	TestGumballMachineWithDynamicState();
-
+	CAppMenu().Run(cin, cout, cerr);
 	return 0;
 }

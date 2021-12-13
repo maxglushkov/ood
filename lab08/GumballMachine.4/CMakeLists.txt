@@ -10,4 +10,5 @@ add_subdirectory(tests)
 add_executable(
 	GumballMachine
 	main.cpp
+	CMenu.cpp
 )
