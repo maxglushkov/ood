@@ -37,7 +37,7 @@ TEST_CASE(TEST_SUITE_NAME" (has gumballs): up to MAX_QUARTER_COUNT can be insert
 	TestMachineState(machine, State::HasQuarter, 1, 1);
 	machine.InsertQuarter();
 	TestMachineState(machine, State::HasQuarter, 1, 2);
-	for (int quarter = 2; quarter < CGumballMachine::MAX_QUARTER_COUNT; ++quarter)
+	for (unsigned quarter = 2; quarter < CGumballMachine::MAX_QUARTER_COUNT; ++quarter)
 	{
 		machine.InsertQuarter();
 	}

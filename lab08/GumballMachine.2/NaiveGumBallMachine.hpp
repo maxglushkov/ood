@@ -32,6 +32,7 @@ public:
 			break;
 		case State::NoQuarter:
 			m_state = State::HasQuarter;
+			[[fallthrough]];
 		case State::HasQuarter:
 			if (m_quarterCount < MAX_QUARTER_COUNT)
 			{
@@ -54,6 +55,7 @@ public:
 		{
 		case State::HasQuarter:
 			m_state = State::NoQuarter;
+			[[fallthrough]];
 		case State::SoldOut:
 			cout << m_quarterCount << " quarter" << (m_quarterCount == 1 ? "" : "s") << " returned\n";
 			m_quarterCount = 0;
