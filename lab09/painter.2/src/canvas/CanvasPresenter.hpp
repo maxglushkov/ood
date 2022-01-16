@@ -1,5 +1,4 @@
 #pragma once
-#include <gtkmm/widget.h>
 #include <optional>
 #include "../model/Drawing.hpp"
 #include "SelectionFrame.hpp"
@@ -7,29 +6,47 @@
 class CanvasPresenter: public sigc::trackable
 {
 public:
-	CanvasPresenter(Gtk::Widget & widget, Drawing & drawing);
+	struct View: virtual public sigc::trackable
+	{
+		virtual ~View() = default;
+
+		virtual void Redraw() = 0;
+
+		virtual void SetCursor(Direction dir) = 0;
+	};
+
+	CanvasPresenter(View & view, Drawing & drawing);
 
 	void DeleteSelection()
 	{
 		m_drawing.DeleteSelection();
 	}
 
-	void InsertRectangle();
+	void InsertRectangle()
+	{
+		InsertShape(IDrawingItem::Type::Rectangle);
+	}
 
-	void InsertTriangle();
+	void InsertTriangle()
+	{
+		InsertShape(IDrawingItem::Type::Triangle);
+	}
 
-	void InsertEllipse();
+	void InsertEllipse()
+	{
+		InsertShape(IDrawingItem::Type::Ellipse);
+	}
 
-	void MouseDown(GdkEventButton * event);
+	void MouseLeftButtonDown(Point const& pos);
 
-	void MouseUp(GdkEventButton * event);
+	void MouseLeftButtonUp(Point const& pos);
 
-	void MouseMove(GdkEventMotion * event);
+	void MouseMove(Point const& pos);
 
-	void Draw(Cairo::RefPtr<Cairo::Context> const& cr);
+	void Draw(ICanvas & canvas);
 
 private:
-	Gtk::Widget & m_widget;
+	View & m_view;
 	Drawing & m_drawing;
 
 	SelectionFrame m_selectionFrame;
@@ -38,7 +55,9 @@ private:
 
 	void OnSelectionChanged(IDrawingItem const* item, bool imageChanged);
 
-	void OnImageChanged();
+	void InsertShape(IDrawingItem::Type type);
 
-	void UpdateCursorType(Point const& point);
+	void SetSelection(Point const& pos);
+
+	void UpdateCursorType(Point const& pos);
 };

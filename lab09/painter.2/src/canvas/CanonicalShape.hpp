@@ -1,7 +1,7 @@
 #pragma once
-#include "IDrawingItem.hpp"
+#include "ICanvasPresenterItem.hpp"
 
-class CanonicalShape: public IDrawingItem
+class CanonicalShape: public ICanvasPresenterItem
 {
 public:
 	explicit CanonicalShape(BoundingBox const& bounds)
@@ -9,13 +9,6 @@ public:
 	{}
 
 	void Draw(ICanvas & canvas)const override;
-
-	BoundingBox GetBoundingBox()const override
-	{
-		return m_bounds;
-	}
-
-	void MoveBoundsRelative(BoundingBox const& delta)override;
 
 protected:
 	BoundingBox m_bounds;

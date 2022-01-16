@@ -1,9 +1,18 @@
 #pragma once
-#include "IDrawable.hpp"
+#include "types.hpp"
 
-struct IDrawingItem: public IDrawable
+struct IDrawingItem
 {
-	virtual bool HitTest(Point const& point)const = 0;
+	enum class Type
+	{
+		Ellipse,
+		Rectangle,
+		Triangle
+	};
+
+	virtual ~IDrawingItem() = default;
+
+	virtual Type GetType()const = 0;
 
 	virtual BoundingBox GetBoundingBox()const = 0;
 

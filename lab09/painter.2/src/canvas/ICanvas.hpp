@@ -1,5 +1,5 @@
 #pragma once
-#include "types.hpp"
+#include "../model/types.hpp"
 
 struct ICanvas
 {

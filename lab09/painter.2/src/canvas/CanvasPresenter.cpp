@@ -1,66 +1,46 @@
-#include "CairoCanvas.hpp"
+#include <algorithm>
+#include "../model/RectangularShape.hpp"
 #include "CanvasPresenter.hpp"
-#include "../model/Ellipse.hpp"
-#include "../model/Rectangle.hpp"
-#include "../model/Triangle.hpp"
+#include "ICanvasPresenterItem.hpp"
 
-constexpr static BoundingBox DEFAULT_SHAPE_BOUNDS{160, 120, 480, 360};
-
-CanvasPresenter::CanvasPresenter(Gtk::Widget & widget, Drawing & drawing)
-	:m_widget(widget)
+CanvasPresenter::CanvasPresenter(View & view, Drawing & drawing)
+	:m_view(view)
 	,m_drawing(drawing)
 {
 	m_drawing.SelectionChangedSignal().connect(sigc::mem_fun(*this, &CanvasPresenter::OnSelectionChanged));
-	m_drawing.ImageChangedSignal().connect(sigc::mem_fun(*this, &CanvasPresenter::OnImageChanged));
+	m_drawing.ImageChangedSignal().connect(sigc::mem_fun(m_view, &View::Redraw));
 }
 
-void CanvasPresenter::InsertRectangle()
+void CanvasPresenter::MouseLeftButtonDown(Point const& pos)
 {
-	m_drawing.PushTop(std::make_unique<Rectangle>(DEFAULT_SHAPE_BOUNDS));
-}
-
-void CanvasPresenter::InsertTriangle()
-{
-	m_drawing.PushTop(std::make_unique<Triangle>(DEFAULT_SHAPE_BOUNDS));
-}
-
-void CanvasPresenter::InsertEllipse()
-{
-	m_drawing.PushTop(std::make_unique<Ellipse>(DEFAULT_SHAPE_BOUNDS));
-}
-
-void CanvasPresenter::MouseDown(GdkEventButton * event)
-{
-	if (event->button == 1)
+	if (m_movingDir.none())
 	{
-		if (m_movingDir.none())
+		SetSelection(pos);
+		if (!m_drawing.HasSelection())
 		{
-			if (!m_drawing.SetSelection({event->x, event->y}))
-			{
-				return;
-			}
-			m_movingDir.set(Direction::Left).set(Direction::Top).set(Direction::Right).set(Direction::Bottom);
+			return;
 		}
-		m_movingAnchor = {event->x, event->y};
+		m_movingDir.set(Direction::Left).set(Direction::Top).set(Direction::Right).set(Direction::Bottom);
 	}
+	m_movingAnchor = pos;
 }
 
-void CanvasPresenter::MouseUp(GdkEventButton * event)
+void CanvasPresenter::MouseLeftButtonUp(Point const& pos)
 {
-	if (event->button == 1)
+	if (m_movingAnchor.has_value())
 	{
 		m_movingAnchor = std::nullopt;
-		UpdateCursorType({event->x, event->y});
+		UpdateCursorType(pos);
 	}
 }
 
-void CanvasPresenter::MouseMove(GdkEventMotion * event)
+void CanvasPresenter::MouseMove(Point const& pos)
 {
-	if (m_movingAnchor)
+	if (m_movingAnchor.has_value())
 	{
 		const Point absPos{
-			std::clamp(event->x, 0.0, m_drawing.GetSize().width),
-			std::clamp(event->y, 0.0, m_drawing.GetSize().height)
+			std::clamp(pos.x, 0.0, m_drawing.GetSize().width),
+			std::clamp(pos.y, 0.0, m_drawing.GetSize().height)
 		};
 		const Point relPos = absPos - *m_movingAnchor;
 		m_drawing.MoveSelectionBoundsRelative({
@@ -73,14 +53,20 @@ void CanvasPresenter::MouseMove(GdkEventMotion * event)
 	}
 	else
 	{
-		UpdateCursorType({event->x, event->y});
+		UpdateCursorType(pos);
 	}
 }
 
-void CanvasPresenter::Draw(Cairo::RefPtr<Cairo::Context> const& cr)
+void CanvasPresenter::Draw(ICanvas & canvas)
 {
-	CairoCanvas canvas(cr);
-	m_drawing.Draw(canvas);
+	canvas.DrawRectangle({{}, m_drawing.GetSize()});
+	canvas.SetColor(m_drawing.GetBackgroundColor());
+	canvas.Fill();
+
+	for (auto it = m_drawing.end(); it != m_drawing.begin();)
+	{
+		MakeCanvasPresenterItem(**--it)->Draw(canvas);
+	}
 	m_selectionFrame.Draw(canvas);
 }
 
@@ -89,41 +75,34 @@ void CanvasPresenter::OnSelectionChanged(IDrawingItem const* item, bool imageCha
 	m_selectionFrame.SetSelection(item);
 	if (!imageChanged)
 	{
-		OnImageChanged();
+		m_view.Redraw();
 	}
 }
 
-void CanvasPresenter::OnImageChanged()
+void CanvasPresenter::InsertShape(IDrawingItem::Type type)
 {
-	if (const auto window = m_widget.get_window())
-	{
-		window->invalidate(false);
-	}
+	constexpr static BoundingBox DEFAULT_SHAPE_BOUNDS{160, 120, 480, 360};
+	m_drawing.PushFront(std::make_unique<RectangularShape>(type, DEFAULT_SHAPE_BOUNDS));
 }
 
-void CanvasPresenter::UpdateCursorType(Point const& point)
+void CanvasPresenter::SetSelection(Point const& pos)
 {
-	if (const auto window = m_widget.get_window())
+	auto it = m_drawing.begin();
+	for (; it != m_drawing.end(); ++it)
 	{
-		const Direction movingDir = m_selectionFrame.HitTest(point);
-		if (movingDir == m_movingDir)
+		if (MakeCanvasPresenterItem(**it)->HitTest(pos))
 		{
-			return;
+			break;
 		}
-		m_movingDir = movingDir;
+	}
+	m_drawing.SetSelection(it);
+}
 
-		window->set_cursor(Gdk::Cursor::create(
-			movingDir[Direction::Top] ?
-				movingDir[Direction::Left] ? Gdk::TOP_LEFT_CORNER :
-				movingDir[Direction::Right] ? Gdk::TOP_RIGHT_CORNER :
-				Gdk::TOP_SIDE :
-			movingDir[Direction::Bottom] ?
-				movingDir[Direction::Left] ? Gdk::BOTTOM_LEFT_CORNER :
-				movingDir[Direction::Right] ? Gdk::BOTTOM_RIGHT_CORNER :
-				Gdk::BOTTOM_SIDE :
-			movingDir[Direction::Left] ? Gdk::LEFT_SIDE :
-			movingDir[Direction::Right] ? Gdk::RIGHT_SIDE :
-			Gdk::ARROW
-		));
+void CanvasPresenter::UpdateCursorType(Point const& pos)
+{
+	const Direction movingDir = m_selectionFrame.HitTest(pos);
+	if (movingDir != m_movingDir)
+	{
+		m_view.SetCursor(m_movingDir = movingDir);
 	}
 }

@@ -1,11 +1,8 @@
-#include "CanonicalShape.hpp"
-
-constexpr static RGBAColor FILL_COLOR(1.0, 1.0, 0.0);
-constexpr static RGBAColor OUTLINE_COLOR(1.0, 0.0, 0.0);
-constexpr static double MIN_DIMENSION = 1.0;
+#include "RectangularShape.hpp"
 
 static void FixDimension(double & min, double & max, bool preserveMin = true)
 {
+	constexpr static double MIN_DIMENSION = 1.0;
 	if (max - min < MIN_DIMENSION)
 	{
 		if (preserveMin)
@@ -19,16 +16,7 @@ static void FixDimension(double & min, double & max, bool preserveMin = true)
 	}
 }
 
-void CanonicalShape::Draw(ICanvas & canvas)const
-{
-	DrawPath(canvas);
-	canvas.SetColor(FILL_COLOR);
-	canvas.FillPreserve();
-	canvas.SetColor(OUTLINE_COLOR);
-	canvas.Stroke();
-}
-
-void CanonicalShape::MoveBoundsRelative(BoundingBox const& delta)
+void RectangularShape::MoveBoundsRelative(BoundingBox const& delta)
 {
 	m_bounds.xMin += delta.xMin;
 	m_bounds.yMin += delta.yMin;

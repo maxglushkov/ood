@@ -4,13 +4,15 @@ add_library(
 	PainterApplication.cpp
 	PainterWindow.cpp
 	canvas/CairoCanvas.cpp
+	canvas/CanonicalShape.cpp
 	canvas/CanvasPresenter.cpp
 	canvas/CanvasWidget.cpp
+	canvas/Ellipse.cpp
+	canvas/ICanvasPresenterItem.cpp
+	canvas/Rectangle.cpp
 	canvas/SelectionFrame.cpp
-	model/CanonicalShape.cpp
+	canvas/Triangle.cpp
 	model/Drawing.cpp
-	model/Ellipse.cpp
-	model/Rectangle.cpp
-	model/Triangle.cpp
+	model/RectangularShape.cpp
 )
 target_include_directories(painter-src SYSTEM PRIVATE ${GTKMM_INCLUDE_DIRS})

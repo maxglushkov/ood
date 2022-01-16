@@ -1,7 +1,8 @@
 #pragma once
 #include "../model/IDrawingItem.hpp"
+#include "ICanvas.hpp"
 
-class SelectionFrame: public IDrawable
+class SelectionFrame
 {
 public:
 	void SetSelection(IDrawingItem const* item)
@@ -11,7 +12,7 @@ public:
 
 	Direction HitTest(Point const& point)const;
 
-	void Draw(ICanvas & canvas)const override;
+	void Draw(ICanvas & canvas)const;
 
 private:
 	IDrawingItem const* m_item = nullptr;

@@ -1,6 +1,6 @@
 #pragma once
 #include <cairomm/context.h>
-#include "../model/ICanvas.hpp"
+#include "ICanvas.hpp"
 
 class CairoCanvas: public ICanvas
 {

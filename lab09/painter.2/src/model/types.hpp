@@ -24,11 +24,11 @@ struct Rect
 {
 	double x, y, width, height;
 
-	constexpr Rect(double x, double y, double width, double height)
-		:x(x)
-		,y(y)
-		,width(width)
-		,height(height)
+	constexpr Rect(Point const& point, Size const& size)
+		:x(point.x)
+		,y(point.y)
+		,width(size.width)
+		,height(size.height)
 	{}
 
 	constexpr Rect(BoundingBox const& bounds)
@@ -61,3 +61,12 @@ struct RGBAColor
 		,a(a)
 	{}
 };
+
+namespace Color
+{
+	constexpr static RGBAColor BLACK(0.0, 0.0, 0.0);
+	constexpr static RGBAColor RED(1.0, 0.0, 0.0);
+	constexpr static RGBAColor YELLOW(1.0, 1.0, 0.0);
+	constexpr static RGBAColor GREEN(0.0, 0.75, 0.0);
+	constexpr static RGBAColor WHITE(1.0, 1.0, 1.0);
+}

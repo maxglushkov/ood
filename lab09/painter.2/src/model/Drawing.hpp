@@ -5,11 +5,16 @@
 
 typedef std::unique_ptr<IDrawingItem> IDrawingItemPtr;
 
-class Drawing: public IDrawable
+class Drawing
 {
 public:
-	Drawing(double width, double height)
+	typedef std::list<IDrawingItemPtr>::const_iterator Iterator;
+	typedef sigc::signal<void(IDrawingItem const*, bool)> SignalSelectionChanged;
+	typedef sigc::signal<void()> SignalImageChanged;
+
+	Drawing(double width, double height, RGBAColor const& bgColor = Color::WHITE)
 		:m_size{width, height}
+		,m_bgColor(bgColor)
 	{}
 
 	Size const& GetSize()const
@@ -17,37 +22,57 @@ public:
 		return m_size;
 	}
 
-	auto SelectionChangedSignal()const
+	RGBAColor const& GetBackgroundColor()const
+	{
+		return m_bgColor;
+	}
+
+	bool HasSelection()const
+	{
+		return m_selection != m_items.cend();
+	}
+
+	Iterator begin()const
+	{
+		return m_items.cbegin();
+	}
+
+	Iterator end()const
+	{
+		return m_items.cend();
+	}
+
+	SignalSelectionChanged SelectionChangedSignal()const
 	{
 		return m_sigSelectionChanged;
 	}
 
-	auto ImageChangedSignal()const
+	SignalImageChanged ImageChangedSignal()const
 	{
 		return m_sigImageChanged;
 	}
 
-	void PushTop(IDrawingItemPtr && item);
+	void PushFront(IDrawingItemPtr && item);
 
-	bool SetSelection(Point const& point);
+	void SetSelection(Iterator it)
+	{
+		SetSelection(it, false);
+	}
 
 	void MoveSelectionBoundsRelative(BoundingBox const& delta);
 
 	void DeleteSelection();
 
-	void Draw(ICanvas & canvas)const override;
-
 private:
 	std::list<IDrawingItemPtr> m_items;
-	std::list<IDrawingItemPtr>::const_iterator m_selection = m_items.cend();
+	Iterator m_selection = m_items.cend();
 	Size m_size;
+	RGBAColor m_bgColor;
 
-	sigc::signal<void(IDrawingItem const*, bool)> m_sigSelectionChanged;
-	sigc::signal<void()> m_sigImageChanged;
-
-	bool HasSelection()const;
+	SignalSelectionChanged m_sigSelectionChanged;
+	SignalImageChanged m_sigImageChanged;
 
 	IDrawingItem * GetSelection();
 
-	void SetSelection(std::list<IDrawingItemPtr>::const_iterator it, bool imageChanged);
+	void SetSelection(Iterator it, bool imageChanged);
 };

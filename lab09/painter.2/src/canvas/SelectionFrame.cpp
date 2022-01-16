@@ -1,18 +1,14 @@
 #include "SelectionFrame.hpp"
 
-constexpr static RGBAColor OUTLINE_COLOR(0.0, 0.0, 0.0);
 constexpr static double OUTLINE_DASH_LENGTH = 5.0;
 constexpr static double OUTLINE_WIDTH = 1.0;
-
 constexpr static double MARKER_RADIUS = 4.0;
-constexpr static RGBAColor MARKER_COLOR(0.0, 0.75, 0.0);
-
 constexpr static double FRAME_WIDTH = 2.0 * MARKER_RADIUS;
 
 static void DrawMarker(ICanvas & canvas, double cx, double cy)
 {
 	canvas.DrawEllipse(cx, cy, MARKER_RADIUS, MARKER_RADIUS);
-	canvas.SetColor(MARKER_COLOR);
+	canvas.SetColor(Color::GREEN);
 	canvas.Fill();
 }
 
@@ -49,7 +45,7 @@ void SelectionFrame::Draw(ICanvas & canvas)const
 	bounds.yMax += MARKER_RADIUS;
 
 	canvas.DrawRectangle(bounds);
-	canvas.SetColor(OUTLINE_COLOR);
+	canvas.SetColor(Color::BLACK);
 	canvas.SetDash(OUTLINE_DASH_LENGTH, OUTLINE_DASH_LENGTH);
 	canvas.SetLineWidth(OUTLINE_WIDTH);
 	canvas.Stroke();
