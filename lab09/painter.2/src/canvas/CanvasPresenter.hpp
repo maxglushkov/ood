@@ -1,6 +1,6 @@
 #pragma once
-#include <optional>
-#include "../model/Drawing.hpp"
+#include <sigc++/trackable.h>
+#include "BoundsMovementState.hpp"
 #include "SelectionFrame.hpp"
 
 class CanvasPresenter: public sigc::trackable
@@ -17,26 +17,6 @@ public:
 
 	CanvasPresenter(View & view, Drawing & drawing);
 
-	void DeleteSelection()
-	{
-		m_drawing.DeleteSelection();
-	}
-
-	void InsertRectangle()
-	{
-		InsertShape(IDrawingItem::Type::Rectangle);
-	}
-
-	void InsertTriangle()
-	{
-		InsertShape(IDrawingItem::Type::Triangle);
-	}
-
-	void InsertEllipse()
-	{
-		InsertShape(IDrawingItem::Type::Ellipse);
-	}
-
 	void MouseLeftButtonDown(Point const& pos);
 
 	void MouseLeftButtonUp(Point const& pos);
@@ -51,11 +31,9 @@ private:
 
 	SelectionFrame m_selectionFrame;
 	Direction m_movingDir;
-	std::optional<Point> m_movingAnchor;
+	BoundsMovementState m_movementState;
 
 	void OnSelectionChanged(IDrawingItem const* item, bool imageChanged);
-
-	void InsertShape(IDrawingItem::Type type);
 
 	void SetSelection(Point const& pos);
 

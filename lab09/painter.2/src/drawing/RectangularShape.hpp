@@ -19,7 +19,17 @@ public:
 		return m_bounds;
 	}
 
-	void MoveBoundsRelative(BoundingBox const& delta)override;
+	void SetBoundingBox(IHistory * history, BoundingBox const& bounds)override;
+
+	IDrawingItem * GetInner()override
+	{
+		return nullptr;
+	}
+
+	IDrawingItemPtr IntoInner()override
+	{
+		return {};
+	}
 
 private:
 	Type m_type;

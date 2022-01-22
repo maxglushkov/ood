@@ -1,5 +1,4 @@
-#include <algorithm>
-#include "../model/RectangularShape.hpp"
+#include "../drawing/Drawing.hpp"
 #include "CanvasPresenter.hpp"
 #include "ICanvasPresenterItem.hpp"
 
@@ -22,34 +21,23 @@ void CanvasPresenter::MouseLeftButtonDown(Point const& pos)
 		}
 		m_movingDir.set(Direction::Left).set(Direction::Top).set(Direction::Right).set(Direction::Bottom);
 	}
-	m_movingAnchor = pos;
+	m_movementState.BeginMovement(pos);
 }
 
 void CanvasPresenter::MouseLeftButtonUp(Point const& pos)
 {
-	if (m_movingAnchor.has_value())
+	if (m_movementState.IsActive())
 	{
-		m_movingAnchor = std::nullopt;
+		m_movementState.EndMovement(m_drawing);
 		UpdateCursorType(pos);
 	}
 }
 
 void CanvasPresenter::MouseMove(Point const& pos)
 {
-	if (m_movingAnchor.has_value())
+	if (m_movementState.IsActive())
 	{
-		const Point absPos{
-			std::clamp(pos.x, 0.0, m_drawing.GetSize().width),
-			std::clamp(pos.y, 0.0, m_drawing.GetSize().height)
-		};
-		const Point relPos = absPos - *m_movingAnchor;
-		m_drawing.MoveSelectionBoundsRelative({
-			m_movingDir[Direction::Left] ? relPos.x : 0.0,
-			m_movingDir[Direction::Top] ? relPos.y : 0.0,
-			m_movingDir[Direction::Right] ? relPos.x : 0.0,
-			m_movingDir[Direction::Bottom] ? relPos.y : 0.0
-		});
-		*m_movingAnchor = absPos;
+		m_movementState.Move(m_drawing, pos, m_movingDir);
 	}
 	else
 	{
@@ -77,12 +65,6 @@ void CanvasPresenter::OnSelectionChanged(IDrawingItem const* item, bool imageCha
 	{
 		m_view.Redraw();
 	}
-}
-
-void CanvasPresenter::InsertShape(IDrawingItem::Type type)
-{
-	constexpr static BoundingBox DEFAULT_SHAPE_BOUNDS{160, 120, 480, 360};
-	m_drawing.PushFront(std::make_unique<RectangularShape>(type, DEFAULT_SHAPE_BOUNDS));
 }
 
 void CanvasPresenter::SetSelection(Point const& pos)

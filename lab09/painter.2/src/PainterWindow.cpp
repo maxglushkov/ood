@@ -5,7 +5,6 @@ PainterWindow::PainterWindow(Drawing & drawing)
 {
 	set_title("Painter");
 	set_default_size(800, 600);
-	insert_action_group("canvas", m_canvas.BuildActionGroup());
 
 	m_canvas.set_halign(Gtk::ALIGN_START);
 	m_canvas.set_valign(Gtk::ALIGN_START);

@@ -1,21 +1,15 @@
 #pragma once
-#include <memory>
 #include <sigc++/signal.h>
 #include "IDrawingItem.hpp"
 
-typedef std::unique_ptr<IDrawingItem> IDrawingItemPtr;
-
-class Drawing
+class Drawing: virtual public sigc::trackable
 {
 public:
-	typedef std::list<IDrawingItemPtr>::const_iterator Iterator;
+	typedef std::list<IDrawingItemPtr>::iterator Iterator;
 	typedef sigc::signal<void(IDrawingItem const*, bool)> SignalSelectionChanged;
 	typedef sigc::signal<void()> SignalImageChanged;
 
-	Drawing(double width, double height, RGBAColor const& bgColor = Color::WHITE)
-		:m_size{width, height}
-		,m_bgColor(bgColor)
-	{}
+	Drawing(IHistory & history, double width, double height, RGBAColor const& bgColor = Color::WHITE);
 
 	Size const& GetSize()const
 	{
@@ -27,19 +21,24 @@ public:
 		return m_bgColor;
 	}
 
+	IDrawingItem const* GetSelection()const
+	{
+		return HasSelection() ? m_selection->get() : nullptr;
+	}
+
 	bool HasSelection()const
 	{
-		return m_selection != m_items.cend();
+		return m_selection != m_items.end();
 	}
 
-	Iterator begin()const
+	Iterator begin()
 	{
-		return m_items.cbegin();
+		return m_items.begin();
 	}
 
-	Iterator end()const
+	Iterator end()
 	{
-		return m_items.cend();
+		return m_items.end();
 	}
 
 	SignalSelectionChanged SelectionChangedSignal()const
@@ -59,20 +58,26 @@ public:
 		SetSelection(it, false);
 	}
 
-	void MoveSelectionBoundsRelative(BoundingBox const& delta);
+	void BeginSelectionBoundsMovement();
+
+	void SetSelectionBounds(BoundingBox const& bounds);
+
+	void EndSelectionBoundsMovement();
 
 	void DeleteSelection();
 
 private:
+	IHistory & m_history;
+
 	std::list<IDrawingItemPtr> m_items;
-	Iterator m_selection = m_items.cend();
+	Iterator m_selection = m_items.end();
 	Size m_size;
 	RGBAColor m_bgColor;
 
 	SignalSelectionChanged m_sigSelectionChanged;
 	SignalImageChanged m_sigImageChanged;
 
-	IDrawingItem * GetSelection();
+	void OnUndoneRedone();
 
 	void SetSelection(Iterator it, bool imageChanged);
 };

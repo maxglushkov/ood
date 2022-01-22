@@ -1,5 +1,5 @@
 #pragma once
-#include "../model/IDrawingItem.hpp"
+#include "../drawing/IDrawingItem.hpp"
 #include "ICanvas.hpp"
 
 class SelectionFrame

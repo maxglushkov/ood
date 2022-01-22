@@ -3,6 +3,7 @@ add_library(
 	main.cpp
 	PainterApplication.cpp
 	PainterWindow.cpp
+	canvas/BoundsMovementState.cpp
 	canvas/CairoCanvas.cpp
 	canvas/CanonicalShape.cpp
 	canvas/CanvasPresenter.cpp
@@ -12,7 +13,8 @@ add_library(
 	canvas/Rectangle.cpp
 	canvas/SelectionFrame.cpp
 	canvas/Triangle.cpp
-	model/Drawing.cpp
-	model/RectangularShape.cpp
+	history/History.cpp
+	drawing/Drawing.cpp
+	drawing/RectangularShape.cpp
 )
 target_include_directories(painter-src SYSTEM PRIVATE ${GTKMM_INCLUDE_DIRS})

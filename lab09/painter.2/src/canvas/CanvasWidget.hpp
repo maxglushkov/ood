@@ -1,5 +1,4 @@
 #pragma once
-#include <giomm/simpleactiongroup.h>
 #include <gtkmm/drawingarea.h>
 #include "CanvasPresenter.hpp"
 
@@ -7,8 +6,6 @@ class CanvasWidget: public Gtk::DrawingArea, private CanvasPresenter::View
 {
 public:
 	explicit CanvasWidget(Drawing & drawing);
-
-	Glib::RefPtr<Gio::SimpleActionGroup> BuildActionGroup();
 
 protected:
 	bool on_button_press_event(GdkEventButton * button_event)override;

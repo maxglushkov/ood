@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "../model/IDrawingItem.hpp"
+#include "../drawing/IDrawingItem.hpp"
 #include "ICanvas.hpp"
 
 struct ICanvasPresenterItem
