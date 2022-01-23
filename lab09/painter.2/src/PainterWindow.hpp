@@ -1,7 +1,7 @@
 #pragma once
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/scrolledwindow.h>
-#include "canvas/CanvasWidget.hpp"
+#include "canvas-view/CanvasWidget.hpp"
 
 class PainterWindow: public Gtk::ApplicationWindow
 {

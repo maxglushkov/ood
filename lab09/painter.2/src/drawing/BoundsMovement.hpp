@@ -34,6 +34,11 @@ public:
 		return std::move(m_item);
 	}
 
+	void AcceptVisitor(IDrawingItemVisitor & visitor, Acceptor const& acceptor = {})const override
+	{
+		m_item->AcceptVisitor(visitor, {acceptor.m_bounds ?: &m_bounds});
+	}
+
 private:
 	IDrawingItemPtr m_item;
 	BoundingBox m_bounds;

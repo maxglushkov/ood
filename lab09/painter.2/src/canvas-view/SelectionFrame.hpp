@@ -1,6 +1,8 @@
 #pragma once
-#include "../drawing/IDrawingItem.hpp"
-#include "ICanvas.hpp"
+#include "../drawing/types.hpp"
+
+struct ICanvas;
+struct IDrawingItem;
 
 class SelectionFrame
 {

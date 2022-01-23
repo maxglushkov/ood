@@ -1,6 +1,6 @@
 #include "../drawing/Drawing.hpp"
+#include "CanvasHitTester.hpp"
 #include "CanvasPresenter.hpp"
-#include "ICanvasPresenterItem.hpp"
 
 CanvasPresenter::CanvasPresenter(View & view, Drawing & drawing)
 	:m_view(view)
@@ -8,6 +8,24 @@ CanvasPresenter::CanvasPresenter(View & view, Drawing & drawing)
 {
 	m_drawing.SelectionChangedSignal().connect(sigc::mem_fun(*this, &CanvasPresenter::OnSelectionChanged));
 	m_drawing.ImageChangedSignal().connect(sigc::mem_fun(m_view, &View::Redraw));
+}
+
+Size const& CanvasPresenter::GetDrawingSize()const
+{
+	return m_drawing.GetSize();
+}
+
+RGBAColor const& CanvasPresenter::GetDrawingBackgroundColor()const
+{
+	return m_drawing.GetBackgroundColor();
+}
+
+void CanvasPresenter::AcceptFrontwardVisitor(IDrawingItemVisitor & visitor)const
+{
+	for (auto it = m_drawing.end(); it != m_drawing.begin();)
+	{
+		(*--it)->AcceptVisitor(visitor);
+	}
 }
 
 void CanvasPresenter::MouseLeftButtonDown(Point const& pos)
@@ -45,19 +63,6 @@ void CanvasPresenter::MouseMove(Point const& pos)
 	}
 }
 
-void CanvasPresenter::Draw(ICanvas & canvas)
-{
-	canvas.DrawRectangle({{}, m_drawing.GetSize()});
-	canvas.SetColor(m_drawing.GetBackgroundColor());
-	canvas.Fill();
-
-	for (auto it = m_drawing.end(); it != m_drawing.begin();)
-	{
-		MakeCanvasPresenterItem(**--it)->Draw(canvas);
-	}
-	m_selectionFrame.Draw(canvas);
-}
-
 void CanvasPresenter::OnSelectionChanged(IDrawingItem const* item, bool imageChanged)
 {
 	m_selectionFrame.SetSelection(item);
@@ -69,10 +74,12 @@ void CanvasPresenter::OnSelectionChanged(IDrawingItem const* item, bool imageCha
 
 void CanvasPresenter::SetSelection(Point const& pos)
 {
+	CanvasHitTester hitTester(pos);
 	auto it = m_drawing.begin();
 	for (; it != m_drawing.end(); ++it)
 	{
-		if (MakeCanvasPresenterItem(**it)->HitTest(pos))
+		(*it)->AcceptVisitor(hitTester);
+		if (hitTester.IsHit())
 		{
 			break;
 		}

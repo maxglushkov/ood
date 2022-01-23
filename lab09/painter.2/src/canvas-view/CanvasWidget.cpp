@@ -1,11 +1,11 @@
-#include "../drawing/Drawing.hpp"
-#include "CairoCanvas.hpp"
+#include "../canvas/CairoCanvas.hpp"
+#include "../canvas/CanvasPainter.hpp"
 #include "CanvasWidget.hpp"
 
 CanvasWidget::CanvasWidget(Drawing & drawing)
 	:m_presenter(*this, drawing)
 {
-	set_size_request(int(drawing.GetSize().width), int(drawing.GetSize().height));
+	set_size_request(int(m_presenter.GetDrawingSize().width), int(m_presenter.GetDrawingSize().height));
 	add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 }
 
@@ -38,7 +38,14 @@ bool CanvasWidget::on_motion_notify_event(GdkEventMotion * motion_event)
 bool CanvasWidget::on_draw(Cairo::RefPtr<Cairo::Context> const& cr)
 {
 	CairoCanvas canvas(cr);
-	m_presenter.Draw(canvas);
+	canvas.DrawRectangle({{}, m_presenter.GetDrawingSize()});
+	canvas.SetColor(m_presenter.GetDrawingBackgroundColor());
+	canvas.Fill();
+
+	CanvasPainter painter(canvas);
+	m_presenter.AcceptFrontwardVisitor(painter);
+
+	m_presenter.GetSelectionFrame().Draw(canvas);
 	return true;
 }
 

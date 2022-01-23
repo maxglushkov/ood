@@ -1,3 +1,5 @@
+#include "../canvas/ICanvas.hpp"
+#include "../drawing/IDrawingItem.hpp"
 #include "SelectionFrame.hpp"
 
 constexpr static double OUTLINE_DASH_LENGTH = 5.0;

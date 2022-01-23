@@ -2,6 +2,7 @@
 #include <memory>
 #include "types.hpp"
 
+struct IDrawingItemVisitor;
 struct IHistory;
 
 struct IDrawingItem;
@@ -9,6 +10,13 @@ typedef std::unique_ptr<IDrawingItem> IDrawingItemPtr;
 
 struct IDrawingItem
 {
+protected:
+	struct Acceptor
+	{
+		BoundingBox const* m_bounds;
+	};
+
+public:
 	enum class Type
 	{
 		Ellipse,
@@ -27,4 +35,6 @@ struct IDrawingItem
 	virtual IDrawingItem * GetInner() = 0;
 
 	virtual IDrawingItemPtr IntoInner() = 0;
+
+	virtual void AcceptVisitor(IDrawingItemVisitor & visitor, Acceptor const& acceptor = {})const = 0;
 };

@@ -3,16 +3,13 @@ add_library(
 	main.cpp
 	PainterApplication.cpp
 	PainterWindow.cpp
-	canvas/BoundsMovementState.cpp
 	canvas/CairoCanvas.cpp
-	canvas/CanonicalShape.cpp
-	canvas/CanvasPresenter.cpp
-	canvas/CanvasWidget.cpp
-	canvas/Ellipse.cpp
-	canvas/ICanvasPresenterItem.cpp
-	canvas/Rectangle.cpp
-	canvas/SelectionFrame.cpp
-	canvas/Triangle.cpp
+	canvas/CanvasPainter.cpp
+	canvas-view/BoundsMovementState.cpp
+	canvas-view/CanvasHitTester.cpp
+	canvas-view/CanvasPresenter.cpp
+	canvas-view/CanvasWidget.cpp
+	canvas-view/SelectionFrame.cpp
 	history/History.cpp
 	drawing/Drawing.cpp
 	drawing/RectangularShape.cpp

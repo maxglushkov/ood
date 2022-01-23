@@ -31,6 +31,8 @@ public:
 		return {};
 	}
 
+	void AcceptVisitor(IDrawingItemVisitor & visitor, Acceptor const& acceptor = {})const override;
+
 private:
 	Type m_type;
 	BoundingBox m_bounds;

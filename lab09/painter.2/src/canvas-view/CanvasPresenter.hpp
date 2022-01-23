@@ -3,6 +3,8 @@
 #include "BoundsMovementState.hpp"
 #include "SelectionFrame.hpp"
 
+struct IDrawingItemVisitor;
+
 class CanvasPresenter: public sigc::trackable
 {
 public:
@@ -17,13 +19,22 @@ public:
 
 	CanvasPresenter(View & view, Drawing & drawing);
 
+	Size const& GetDrawingSize()const;
+
+	RGBAColor const& GetDrawingBackgroundColor()const;
+
+	SelectionFrame const& GetSelectionFrame()const
+	{
+		return m_selectionFrame;
+	}
+
+	void AcceptFrontwardVisitor(IDrawingItemVisitor & visitor)const;
+
 	void MouseLeftButtonDown(Point const& pos);
 
 	void MouseLeftButtonUp(Point const& pos);
 
 	void MouseMove(Point const& pos);
-
-	void Draw(ICanvas & canvas);
 
 private:
 	View & m_view;
