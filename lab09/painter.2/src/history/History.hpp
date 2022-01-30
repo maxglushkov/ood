@@ -9,17 +9,16 @@ public:
 
 	void Redo()noexcept;
 
+	bool IsLocked()const override
+	{
+		return bool(m_operation);
+	}
+
 	void Do(ICommandPtr && command)override;
 
-	void Lock()override
-	{
-		++m_lock;
-	}
+	void BeginOperation(ICommandPtr && doneCommand)override;
 
-	void Unlock()override
-	{
-		--m_lock;
-	}
+	void Commit()override;
 
 	SignalUndoneRedone UndoneRedoneSignal()const override
 	{
@@ -31,11 +30,13 @@ private:
 
 	std::deque<ICommandPtr> m_history;
 	Iterator m_pos = m_history.cend();
-	unsigned m_lock = 0;
+	ICommandPtr m_operation;
 
 	SignalUndoneRedone m_sigUndoneRedone;
 
 	bool CanUndo()const;
 
 	bool CanRedo()const;
+
+	void Push(ICommandPtr && command);
 };

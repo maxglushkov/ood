@@ -1,14 +1,19 @@
 #pragma once
 
-struct BoundingBox;
+struct Ellipse;
+struct Rectangle;
+struct Triangle;
+
+template<typename T>
+class RectangularShape;
 
 struct IDrawingItemVisitor
 {
 	virtual ~IDrawingItemVisitor() = default;
 
-	virtual void VisitEllipse(double cx, double cy, double rx, double ry) = 0;
+	virtual void Visit(RectangularShape<Ellipse> const& ellipse) = 0;
 
-	virtual void VisitRectangle(BoundingBox const& rect) = 0;
+	virtual void Visit(RectangularShape<Rectangle> const& rectangle) = 0;
 
-	virtual void VisitTriangle(double xTop, double yTop, double xBottomLeft, double xBottomRight, double yBottom) = 0;
+	virtual void Visit(RectangularShape<Triangle> const& triangle) = 0;
 };

@@ -1,24 +1,29 @@
 #include <cmath>
+#include "../drawing/RectangularShape.hpp"
+#include "../drawing/shapes.hpp"
 #include "CanvasHitTester.hpp"
 
-void CanvasHitTester::VisitEllipse(double cx, double cy, double rx, double ry)
+void CanvasHitTester::Visit(RectangularShape<Ellipse> const& ellipse)
 {
-	m_isHit = pow(m_pos.x - cx, 2.0) / pow(rx, 2.0) + pow(m_pos.y - cy, 2.0) / pow(ry, 2.0) <= 1.0;
+	const Ellipse info = ellipse.GetInfo();
+	m_isHit = pow(m_pos.x - info.cx, 2.0) / pow(info.rx, 2.0) + pow(m_pos.y - info.cy, 2.0) / pow(info.ry, 2.0) <= 1.0;
 }
 
-void CanvasHitTester::VisitRectangle(BoundingBox const& rect)
+void CanvasHitTester::Visit(RectangularShape<Rectangle> const& rectangle)
 {
-	m_isHit = m_pos.x >= rect.xMin && m_pos.x <= rect.xMax
-	       && m_pos.y >= rect.yMin && m_pos.y <= rect.yMax;
+	const BoundingBox bounds = rectangle.GetBoundingBox();
+	m_isHit = m_pos.x >= bounds.xMin && m_pos.x <= bounds.xMax
+	       && m_pos.y >= bounds.yMin && m_pos.y <= bounds.yMax;
 }
 
-void CanvasHitTester::VisitTriangle(double xTop, double yTop, double xBottomLeft, double xBottomRight, double yBottom)
+void CanvasHitTester::Visit(RectangularShape<Triangle> const& triangle)
 {
-	if (m_pos.y <= yTop || m_pos.y > yBottom)
+	const Triangle info = triangle.GetInfo();
+	if (m_pos.y <= info.yTop || m_pos.y > info.yBottom)
 	{
 		m_isHit = false;
 		return;
 	}
-	m_isHit = (m_pos.x - xTop) / ((m_pos.x <= xTop ? xBottomLeft : xBottomRight) - xTop)
-	        * (yBottom - yTop) / (m_pos.y - yTop) <= 1.0;
+	m_isHit = (m_pos.x - info.xTop) / ((m_pos.x <= info.xTop ? info.xBottomLeft : info.xBottomRight) - info.xTop)
+	        * (info.yBottom - info.yTop) / (m_pos.y - info.yTop) <= 1.0;
 }

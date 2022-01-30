@@ -1,17 +1,21 @@
 #pragma once
 #include "IDrawingItem.hpp"
 
-class RectangularShape: public IDrawingItem
+struct Ellipse;
+struct Rectangle;
+struct Triangle;
+
+template<typename T>
+class RectangularShape final: public IDrawingItem
 {
 public:
-	RectangularShape(Type type, BoundingBox const& bounds)
-		:m_type(type)
-		,m_bounds(bounds)
+	explicit RectangularShape(BoundingBox const& bounds)
+		:m_bounds(bounds)
 	{}
 
-	Type GetType()const override
+	T GetInfo()const
 	{
-		return m_type;
+		return m_bounds;
 	}
 
 	BoundingBox GetBoundingBox()const override
@@ -19,21 +23,19 @@ public:
 		return m_bounds;
 	}
 
-	void SetBoundingBox(IHistory * history, BoundingBox const& bounds)override;
-
-	IDrawingItem * GetInner()override
+	void SetBoundingBox(BoundingBox const& bounds)override
 	{
-		return nullptr;
+		m_bounds = bounds;
 	}
 
-	IDrawingItemPtr IntoInner()override
-	{
-		return {};
-	}
+	void BeginBoundingBoxOperation(IHistory & history)override;
 
-	void AcceptVisitor(IDrawingItemVisitor & visitor, Acceptor const& acceptor = {})const override;
+	void AcceptVisitor(IDrawingItemVisitor & visitor)const override;
 
 private:
-	Type m_type;
 	BoundingBox m_bounds;
 };
+
+extern template class RectangularShape<Ellipse>;
+extern template class RectangularShape<Rectangle>;
+extern template class RectangularShape<Triangle>;

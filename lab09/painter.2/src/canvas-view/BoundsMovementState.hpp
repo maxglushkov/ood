@@ -1,7 +1,7 @@
 #pragma once
 #include "../drawing/types.hpp"
 
-struct Drawing;
+class Drawing;
 
 class BoundsMovementState
 {

@@ -1,4 +1,8 @@
+#include <stdexcept>
 #include "History.hpp"
+
+constexpr static char ERROR_LOCKED[] = "command history is locked";
+constexpr static char ERROR_NOTHING_TO_COMMIT[] = "command history: nothing to commit";
 
 void History::Undo()noexcept
 {
@@ -22,17 +26,49 @@ void History::Redo()noexcept
 
 void History::Do(ICommandPtr && command)
 {
-	m_pos = m_history.erase(m_pos, m_history.cend());
-	m_history.emplace_back(std::move(command))->Do();
-	m_pos = m_history.cend();
+	if (IsLocked())
+	{
+		throw std::logic_error(ERROR_LOCKED);
+	}
+
+	ICommand *const cmd = command.get();
+	Push(std::move(command));
+	cmd->Do();
+}
+
+void History::BeginOperation(ICommandPtr && doneCommand)
+{
+	if (IsLocked())
+	{
+		throw std::logic_error(ERROR_LOCKED);
+	}
+
+	m_operation = std::move(doneCommand);
+}
+
+void History::Commit()
+{
+	if (!m_operation)
+	{
+		throw std::logic_error(ERROR_NOTHING_TO_COMMIT);
+	}
+
+	Push(std::move(m_operation));
 }
 
 bool History::CanUndo()const
 {
-	return !m_lock && m_pos != m_history.cbegin();
+	return !IsLocked() && m_pos != m_history.cbegin();
 }
 
 bool History::CanRedo()const
 {
-	return !m_lock && m_pos != m_history.cend();
+	return !IsLocked() && m_pos != m_history.cend();
+}
+
+void History::Push(ICommandPtr && command)
+{
+	m_pos = m_history.erase(m_pos, m_history.cend());
+	m_history.push_back(std::move(command));
+	m_pos = m_history.cend();
 }

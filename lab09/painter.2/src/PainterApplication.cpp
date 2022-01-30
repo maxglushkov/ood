@@ -16,6 +16,21 @@ void PainterApplication::on_activate()
 	m_mainWindow.show();
 }
 
+void PainterApplication::InsertRectangle()
+{
+	InsertShape<Rectangle>();
+}
+
+void PainterApplication::InsertTriangle()
+{
+	InsertShape<Triangle>();
+}
+
+void PainterApplication::InsertEllipse()
+{
+	InsertShape<Ellipse>();
+}
+
 void PainterApplication::SetupMenu()
 {
 	const auto menuEdit = Gio::Menu::create();
@@ -45,8 +60,8 @@ void PainterApplication::SetupMenu()
 	add_action("insert_ellipse", sigc::mem_fun(*this, &PainterApplication::InsertEllipse));
 }
 
-void PainterApplication::InsertShape(IDrawingItem::Type type)
+template<typename T>
+void PainterApplication::InsertShape()
 {
-	constexpr static BoundingBox DEFAULT_SHAPE_BOUNDS{160, 120, 480, 360};
-	m_drawing.PushFront(std::make_unique<RectangularShape>(type, DEFAULT_SHAPE_BOUNDS));
+	m_drawing.PushFront(std::make_unique<RectangularShape<T>>(DEFAULT_SHAPE_BOUNDS));
 }

@@ -9,7 +9,7 @@ constexpr static double FRAME_WIDTH = 2.0 * MARKER_RADIUS;
 
 static void DrawMarker(ICanvas & canvas, double cx, double cy)
 {
-	canvas.DrawEllipse(cx, cy, MARKER_RADIUS, MARKER_RADIUS);
+	canvas.DrawEllipse({cx, cy, MARKER_RADIUS, MARKER_RADIUS});
 	canvas.SetColor(Color::GREEN);
 	canvas.Fill();
 }

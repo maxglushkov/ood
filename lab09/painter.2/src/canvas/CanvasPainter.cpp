@@ -1,3 +1,4 @@
+#include "../drawing/RectangularShape.hpp"
 #include "CanvasPainter.hpp"
 #include "ICanvas.hpp"
 
@@ -9,23 +10,24 @@ void CanvasPainter::FillAndStroke()
 	m_canvas.Stroke();
 }
 
-void CanvasPainter::VisitEllipse(double cx, double cy, double rx, double ry)
+void CanvasPainter::Visit(RectangularShape<Ellipse> const& ellipse)
 {
-	m_canvas.DrawEllipse(cx, cy, rx, ry);
+	m_canvas.DrawEllipse(ellipse.GetInfo());
 	FillAndStroke();
 }
 
-void CanvasPainter::VisitRectangle(BoundingBox const& rect)
+void CanvasPainter::Visit(RectangularShape<Rectangle> const& rectangle)
 {
-	m_canvas.DrawRectangle(rect);
+	m_canvas.DrawRectangle(rectangle.GetInfo());
 	FillAndStroke();
 }
 
-void CanvasPainter::VisitTriangle(double xTop, double yTop, double xBottomLeft, double xBottomRight, double yBottom)
+void CanvasPainter::Visit(RectangularShape<Triangle> const& triangle)
 {
-	m_canvas.MoveTo(xTop, yTop);
-	m_canvas.LineTo(xBottomRight, yBottom);
-	m_canvas.LineTo(xBottomLeft, yBottom);
+	const Triangle info = triangle.GetInfo();
+	m_canvas.MoveTo(info.xTop, info.yTop);
+	m_canvas.LineTo(info.xBottomRight, info.yBottom);
+	m_canvas.LineTo(info.xBottomLeft, info.yBottom);
 	m_canvas.ClosePath();
 	FillAndStroke();
 }

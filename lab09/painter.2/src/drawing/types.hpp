@@ -20,25 +20,6 @@ struct BoundingBox
 	double xMin, yMin, xMax, yMax;
 };
 
-struct Rect
-{
-	double x, y, width, height;
-
-	constexpr Rect(Point const& point, Size const& size)
-		:x(point.x)
-		,y(point.y)
-		,width(size.width)
-		,height(size.height)
-	{}
-
-	constexpr Rect(BoundingBox const& bounds)
-		:x(bounds.xMin)
-		,y(bounds.yMin)
-		,width(bounds.xMax - bounds.xMin)
-		,height(bounds.yMax - bounds.yMin)
-	{}
-};
-
 struct Direction: public std::bitset<4>
 {
 	enum Pos

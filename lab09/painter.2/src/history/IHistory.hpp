@@ -11,11 +11,13 @@ struct IHistory
 
 	virtual ~IHistory() = default;
 
+	virtual bool IsLocked()const = 0;
+
 	virtual void Do(ICommandPtr && command) = 0;
 
-	virtual void Lock() = 0;
+	virtual void BeginOperation(ICommandPtr && doneCommand) = 0;
 
-	virtual void Unlock() = 0;
+	virtual void Commit() = 0;
 
 	virtual SignalUndoneRedone UndoneRedoneSignal()const = 0;
 };

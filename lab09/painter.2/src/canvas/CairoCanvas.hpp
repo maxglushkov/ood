@@ -36,12 +36,12 @@ public:
 		m_cr->close_path();
 	}
 
-	void DrawRectangle(Rect const& rect)override
+	void DrawRectangle(Rectangle const& rect)override
 	{
 		m_cr->rectangle(rect.x, rect.y, rect.width, rect.height);
 	}
 
-	void DrawEllipse(double cx, double cy, double rx, double ry)override;
+	void DrawEllipse(Ellipse const& ellipse)override;
 
 	void Stroke()override
 	{

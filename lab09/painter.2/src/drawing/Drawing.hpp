@@ -1,11 +1,14 @@
 #pragma once
+#include <memory>
 #include <sigc++/signal.h>
 #include "IDrawingItem.hpp"
+
+typedef std::unique_ptr<IDrawingItem> IDrawingItemPtr;
 
 class Drawing: virtual public sigc::trackable
 {
 public:
-	typedef std::list<IDrawingItemPtr>::iterator Iterator;
+	typedef std::list<IDrawingItemPtr>::const_iterator Iterator;
 	typedef sigc::signal<void(IDrawingItem const*, bool)> SignalSelectionChanged;
 	typedef sigc::signal<void()> SignalImageChanged;
 
@@ -28,17 +31,17 @@ public:
 
 	bool HasSelection()const
 	{
-		return m_selection != m_items.end();
+		return m_selection != m_items.cend();
 	}
 
 	Iterator begin()
 	{
-		return m_items.begin();
+		return m_items.cbegin();
 	}
 
 	Iterator end()
 	{
-		return m_items.end();
+		return m_items.cend();
 	}
 
 	SignalSelectionChanged SelectionChangedSignal()const
@@ -70,7 +73,7 @@ private:
 	IHistory & m_history;
 
 	std::list<IDrawingItemPtr> m_items;
-	Iterator m_selection = m_items.end();
+	Iterator m_selection = m_items.cend();
 	Size m_size;
 	RGBAColor m_bgColor;
 

@@ -15,9 +15,9 @@ private:
 
 	void FillAndStroke();
 
-	void VisitEllipse(double cx, double cy, double rx, double ry)override;
+	void Visit(RectangularShape<Ellipse> const& ellipse)override;
 
-	void VisitRectangle(BoundingBox const& rect)override;
+	void Visit(RectangularShape<Rectangle> const& rectangle)override;
 
-	void VisitTriangle(double xTop, double yTop, double xBottomLeft, double xBottomRight, double yBottom)override;
+	void Visit(RectangularShape<Triangle> const& triangle)override;
 };

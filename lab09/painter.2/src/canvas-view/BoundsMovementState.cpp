@@ -39,6 +39,11 @@ void BoundsMovementState::Move(Drawing & drawing, Point const& pos, Direction mo
 {
 	if (m_state != State::Changed)
 	{
+		if (!drawing.HasSelection())
+		{
+			m_state = State::Inactive;
+			return;
+		}
 		m_state = State::Changed;
 		drawing.BeginSelectionBoundsMovement();
 	}

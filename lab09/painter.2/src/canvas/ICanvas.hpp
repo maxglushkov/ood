@@ -1,5 +1,5 @@
 #pragma once
-#include "../drawing/types.hpp"
+#include "../drawing/shapes.hpp"
 
 struct ICanvas
 {
@@ -17,9 +17,9 @@ struct ICanvas
 
 	virtual void ClosePath() = 0;
 
-	virtual void DrawRectangle(Rect const& rect) = 0;
+	virtual void DrawRectangle(Rectangle const& rect) = 0;
 
-	virtual void DrawEllipse(double cx, double cy, double rx, double ry) = 0;
+	virtual void DrawEllipse(Ellipse const& ellipse) = 0;
 
 	virtual void Stroke() = 0;
 
